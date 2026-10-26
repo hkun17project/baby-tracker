@@ -43,7 +43,7 @@
         .btn-sleep-end { background-color: #a5f3fc; border: 4px solid #67e8f9; color: #164e63; }
         .btn-milk-card { background-color: #ffffff; border: 4px solid var(--pastel-primary-light); }
         
-        .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-milk-add:active { background-color: var(--pastel-primary-light); transform: scale(0.95); }
         
         .btn-save { background-color: var(--pastel-primary); border: 4px solid var(--pastel-primary-dark); color: #ffffff; }
@@ -71,24 +71,26 @@
 <body class="flex flex-col h-[100dvh] overflow-hidden text-gray-800">
     <!-- Header -->
     <header class="pastel-header py-3 px-4 shadow-sm z-20 flex-shrink-0 flex items-center justify-between relative">
-        <h1 class="text-2xl font-black tracking-wide flex-1 text-center"><i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span></h1>
+        <h1 class="text-2xl font-black tracking-wide flex-1 text-center">
+            <i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span>
+        </h1>
         <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95 z-30">
             <span id="lang-toggle-text">中/EN</span>
         </button>
         
-        <!-- Status Indicator (Cloud vs Local) -->
-        <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-3 bg-white border-2 border-[var(--pastel-primary-light)] px-3 py-0.5 rounded-full shadow-sm flex items-center gap-1.5 text-[10px] font-bold z-30">
-            <div id="status-dot" class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+        <!-- Status Indicator Pill (Cloud vs Local) -->
+        <button id="status-pill" onclick="openStatusModal()" class="absolute left-1/2 transform -translate-x-1/2 -bottom-3 bg-white border-2 border-[var(--pastel-primary-light)] px-3 py-0.5 rounded-full shadow-sm flex items-center gap-1.5 text-[11px] font-bold z-30 active:scale-95">
+            <div id="status-dot" class="w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse"></div>
             <span id="status-text" class="text-gray-600 whitespace-nowrap" data-i18n="status_connecting">連線中...</span>
-        </div>
+        </button>
     </header>
     
     <!-- Main Content Area -->
     <main class="flex-1 overflow-hidden relative bg-gray-50 pt-2">
         
-        <!-- ================= TAB 1: LOG (記錄) ================= -->
+        <!-- ================= TAB 1: LOG (記錄活動) ================= -->
         <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
-            <!-- 佔比加大 (flex-[1.2]) -->
+            <!-- Top 2x2 Grid (flex-[1.2]) -->
             <div class="grid grid-cols-2 gap-3 flex-[1.2] min-h-0">
                 <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
                     <i class="fas fa-droplet text-5xl"></i>
@@ -108,7 +110,7 @@
                 </button>
             </div>
             
-            <!-- Milk Intake Section (縮小20%，改為 flex-[0.8]) -->
+            <!-- Milk Intake Section (縮小 20%，設為 flex-[0.8]) -->
             <div class="btn-milk-card rounded-[2rem] p-3 shadow-sm flex-[0.8] flex flex-col justify-center min-h-0">
                 <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-2 active:scale-95 transition-transform w-full">
                     <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-3 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
@@ -120,7 +122,7 @@
             </div>
         </section>
         
-        <!-- ================= TAB 2: HISTORY (歷史) ================= -->
+        <!-- ================= TAB 2: HISTORY (查看紀錄) ================= -->
         <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
             <div class="flex items-center justify-between px-4 py-3 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
                 <button onclick="changeDate('history', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
@@ -157,11 +159,12 @@
             </div>
             
             <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
-                <!-- Custom Gantt Chart -->
+                <!-- Custom 24-Hour Gantt Chart (Top) -->
                 <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
+                    <!-- Night Overlays & 3-Hour Vertical Grid Lines (Aligned to track area skipping w-10 icon column) -->
                     <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
-                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
-                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
+                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00:00 - 06:00 -->
+                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18:00 - 23:59 -->
                         <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div>
                         <div class="absolute top-0 bottom-0 left-[25%] border-l border-dashed border-gray-400 opacity-50 z-10"></div>
                         <div class="absolute top-0 bottom-0 left-[37.5%] border-l border-dashed border-gray-400 opacity-50"></div>
@@ -209,7 +212,7 @@
                     </div>
                 </div>
                 
-                <!-- Stat Cards Grid -->
+                <!-- Stat Cards Grid (Bottom) -->
                 <div class="grid grid-cols-4 gap-2 h-[30%] flex-shrink-0 min-h-[120px]">
                     <div class="bg-[var(--pastel-bg)] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
                         <i class="fa-solid fa-bottle-water text-2xl sm:text-3xl text-[var(--pastel-primary)] mb-1"></i>
@@ -333,25 +336,38 @@
             <p id="single-detail-extra" class="text-4xl font-black text-[var(--pastel-primary)] mb-1"></p>
         </div>
     </div>
-    
-    <!-- 改良版 Toast Notification (絕對不會被隱藏) -->
-    <div id="toast" class="fixed bottom-[130px] left-1/2 transform -translate-x-1/2 opacity-0 translate-y-10 transition-all duration-300 z-[100] pointer-events-none hidden w-max">
-        <div class="bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 border border-gray-600">
-            <i class="fas fa-circle-check text-2xl text-green-400"></i>
-            <span id="toast-message" class="text-xl font-bold whitespace-nowrap">記錄成功!</span>
+
+    <!-- Modal: Storage Status & Diagnostic Info -->
+    <div id="modal-status-info" class="fixed inset-0 bg-black/50 z-[85] hidden flex items-center justify-center modal-overlay p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] text-center relative">
+            <button onclick="closeModal('modal-status-info')" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-xl active:scale-95"><i class="fas fa-times"></i></button>
+            <div id="status-modal-icon" class="w-16 h-16 rounded-full mx-auto flex items-center justify-center text-3xl mb-3 bg-[var(--pastel-bg)] text-[var(--pastel-primary)]">
+                <i class="fas fa-cloud"></i>
+            </div>
+            <h3 id="status-modal-title" class="text-2xl font-black text-gray-800 mb-2">儲存狀態資訊</h3>
+            <p id="status-modal-desc" class="text-base font-bold text-gray-600 mb-4 leading-relaxed"></p>
+            <button onclick="closeModal('modal-status-info')" class="w-full btn-save py-3 rounded-xl text-xl font-black shadow-md" data-i18n="confirm">確認</button>
         </div>
     </div>
     
-    <!-- App Scripts (Firebase & Local Fallback) -->
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-[125px] left-1/2 transform -translate-x-1/2 opacity-0 translate-y-10 transition-all duration-300 z-[100] pointer-events-none hidden w-max">
+        <div class="bg-gray-800 text-white px-7 py-4 rounded-full shadow-xl flex items-center gap-3 border-2 border-green-400">
+            <i class="fas fa-circle-check text-2xl text-green-400"></i>
+            <span id="toast-message" class="text-xl font-black whitespace-nowrap">儲存成功！</span>
+        </div>
+    </div>
+    
+    <!-- App Scripts (Firebase v10.12.0 & Local Fallback) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         
         // =========================================================================
-        // FIREBASE CONFIGURATION
+        // FIREBASE CONFIGURATION (Web Client SDK)
         // =========================================================================
-        const manualFirebaseConfig = {
+        const firebaseConfig = {
             apiKey: "AIzaSyDyHrDgTBJXFTDaZ17rqJyjkSp-cvb86_Y",
             authDomain: "baby-tracker-webapp.firebaseapp.com",
             projectId: "baby-tracker-webapp",
@@ -360,18 +376,18 @@
             appId: "1:341594774394:web:e4c029e9de20dd8c8e54c3"
         };
         
-        const app = initializeApp(manualFirebaseConfig);
+        const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = 'homecare-base';
+        const COLLECTION_NAME = 'baby_logs';
         
-        let userId = null;
         let logsData = [];
         let pendingAction = null; 
         let selectedLogId = null; 
         let currentLang = 'zh';
         let currentFilter = 'all'; 
         let useLocalStorage = false;
+        let lastCloudError = '';
         
         let historyDate = new Date();
         let summaryDate = new Date(); 
@@ -416,76 +432,100 @@
         function updateStatusUI(state) {
             const dot = document.getElementById('status-dot');
             const text = document.getElementById('status-text');
+            if (!dot || !text) return;
             if (state === 'connecting') {
-                dot.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-yellow-400 animate-pulse';
                 text.innerText = i18n[currentLang].status_connecting;
             } else if (state === 'cloud') {
-                dot.className = 'w-2 h-2 rounded-full bg-green-500';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-green-500';
                 text.innerText = i18n[currentLang].status_cloud;
             } else if (state === 'local') {
-                dot.className = 'w-2 h-2 rounded-full bg-gray-400';
+                dot.className = 'w-2.5 h-2.5 rounded-full bg-gray-400';
                 text.innerText = i18n[currentLang].status_local;
             }
         }
 
+        window.openStatusModal = function() {
+            const titleEl = document.getElementById('status-modal-title');
+            const descEl = document.getElementById('status-modal-desc');
+            const iconEl = document.getElementById('status-modal-icon');
+            if (!useLocalStorage) {
+                iconEl.innerHTML = '<i class="fas fa-cloud-check text-green-500"></i>';
+                titleEl.innerText = currentLang === 'zh' ? '🟢 已連線雲端資料庫' : '🟢 Cloud Sync Active';
+                descEl.innerText = currentLang === 'zh'
+                    ? '目前所有紀錄皆即時同步至 Firebase 雲端 (baby_logs)，家人與外傭在不同手機開啟都能看到最新資料。'
+                    : 'All baby records are syncing in real time with Firebase Cloud Firestore (baby_logs).';
+            } else {
+                iconEl.innerHTML = '<i class="fas fa-mobile-screen text-gray-500"></i>';
+                titleEl.innerText = currentLang === 'zh' ? '⚪ 本機儲存模式' : '⚪ Local Storage Mode';
+                descEl.innerText = currentLang === 'zh'
+                    ? `目前已自動切換為手機本機儲存，所有記錄功能皆可正常使用！\n\n若要啟用跨裝置雲端同步，請至 Firebase Console -> Firestore Database -> Rules，將規則設為：\nallow read, write: if true;\n(${lastCloudError || '權限或網路未開啟'})`
+                    : `Currently saving to device LocalStorage. To enable Cloud Sync, go to Firebase Console -> Firestore Database -> Rules and set: allow read, write: if true; (${lastCloudError || 'Permission/Network issue'})`;
+            }
+            document.getElementById('modal-status-info').classList.remove('hidden');
+        };
+
         async function initAuth() {
             updateStatusUI('connecting');
             try {
+                // 嘗試匿名登入（若後台未開啟匿名登入，忽略錯誤並直接連線共享資料庫）
                 await signInAnonymously(auth);
-                userId = auth.currentUser.uid;
-                subscribeToData();
             } catch (error) {
-                console.warn("Firebase Auth 失敗:", error);
-                alert("【雲端警告】連線失敗！請確保已在 Firebase Console 開啟「Anonymous(匿名登入)」。\n\n系統已自動為你切換至「本機儲存模式」，功能完全正常可繼續使用！");
-                enableLocalMode();
+                console.info("Anonymous Auth 未啟用，直接嘗試連線 Firestore 共享集合:", error.code || error.message);
             }
+            subscribeToData();
         }
         
-        function enableLocalMode() {
+        function enableLocalMode(errorMsg = '') {
             useLocalStorage = true;
-            userId = 'local_user';
+            lastCloudError = errorMsg;
             updateStatusUI('local');
             const saved = localStorage.getItem('babyTrackerLogsLocal');
-            if(saved) {
-                try { logsData = JSON.parse(saved); } catch(e){}
+            if (saved) {
+                try { logsData = JSON.parse(saved); } catch(e) {}
             }
-            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
-            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+            if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
         }
 
         function saveLocalData() {
             localStorage.setItem('babyTrackerLogsLocal', JSON.stringify(logsData));
-            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
-            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+            if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
         }
 
         function subscribeToData() {
-            if (!userId || useLocalStorage) return;
-            const logsRef = collection(db, 'artifacts', appId, 'users', userId, 'logs');
-            
-            onSnapshot(logsRef, (snapshot) => {
-                logsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                updateStatusUI('cloud');
-                if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
-                if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
-            }, (error) => {
-                console.warn("Firebase Firestore 讀取失敗:", error);
-                alert("【雲端警告】無法存取資料庫！請確保 Firebase Firestore Rules 已設定為 true (測試模式)。\n\n系統已自動切換至「本機儲存模式」。");
-                enableLocalMode();
-            });
+            if (useLocalStorage) return;
+            try {
+                const logsRef = collection(db, COLLECTION_NAME);
+                onSnapshot(logsRef, (snapshot) => {
+                    useLocalStorage = false;
+                    logsData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
+                    // 同步備份一份至本機，確保離線時也有最新資料
+                    localStorage.setItem('babyTrackerLogsLocal', JSON.stringify(logsData));
+                    updateStatusUI('cloud');
+                    if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+                    if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+                }, (error) => {
+                    console.warn("Firestore 讀取切換至本機模式:", error);
+                    enableLocalMode(error.code || error.message);
+                });
+            } catch (err) {
+                console.warn("Firestore 初始化異常，切換至本機模式:", err);
+                enableLocalMode(err.message);
+            }
         }
         
         window.toggleLanguage = function() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('lang-toggle-text').innerText = currentLang === 'zh' ? '中/EN' : 'EN/中';
             updateTexts();
-            if (useLocalStorage) updateStatusUI('local');
-            else if (userId) updateStatusUI('cloud');
+            updateStatusUI(useLocalStorage ? 'local' : 'cloud');
             
-            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
-            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
-            if(!document.getElementById('modal-confirm').classList.contains('hidden') && pendingAction){
-               document.getElementById('modal-confirm-name').innerText = i18n[currentLang][EVENT_DICTIONARY[pendingAction.type].key];
+            if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+            if (!document.getElementById('modal-confirm').classList.contains('hidden') && pendingAction) {
+                document.getElementById('modal-confirm-name').innerText = i18n[currentLang][EVENT_DICTIONARY[pendingAction.type].key];
             }
         };
         
@@ -510,17 +550,21 @@
         };
         
         window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+        
         window.changeModalAmount = function(delta) {
             const input = document.getElementById('modal-amount-input');
-            let val = parseInt(input.value) || 0;
+            let val = parseInt(input.value, 10) || 0;
             val += delta;
             if (val < 0) val = 0;
             input.value = val;
         };
-        window.setModalAmount = function(val) { document.getElementById('modal-amount-input').value = val; };
+        
+        window.setModalAmount = function(val) {
+            document.getElementById('modal-amount-input').value = val;
+        };
         
         window.openConfirmModal = function(type, amount = 0, mode = 'create', existingLog = null) {
-            if (navigator.vibrate) navigator.vibrate(50);
+            if (navigator.vibrate) navigator.vibrate(40);
             pendingAction = { type, mode, id: existingLog?.id };
             const def = EVENT_DICTIONARY[type];
             document.getElementById('modal-confirm-name').innerText = i18n[currentLang][def.key];
@@ -553,36 +597,45 @@
             if (!timeVal) return;
             
             const [hr, mn] = timeVal.split(':').map(Number);
-            const baseTime = pendingAction.mode === 'edit' ? new Date(logsData.find(l=>l.id === pendingAction.id).timestamp) : new Date();
+            const existingItem = pendingAction.mode === 'edit' ? logsData.find(l => l.id === pendingAction.id) : null;
+            const baseTime = existingItem ? new Date(existingItem.timestamp) : new Date();
             baseTime.setHours(hr, mn, 0, 0);
             
             let finalAmount = 0;
-            if (pendingAction.type === 'milk') finalAmount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
+            if (pendingAction.type === 'milk') {
+                finalAmount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
+            }
             const logData = { type: pendingAction.type, timestamp: baseTime.getTime(), amount: finalAmount };
-            
-            const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substr(2, 5);
+            const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substring(2, 7);
 
-            if (useLocalStorage || !userId) {
-                if(pendingAction.mode === 'edit') {
+            // 先關閉視窗並顯示成功提示，給長輩最即時的操作回饋
+            closeModal('modal-confirm');
+            showToast(i18n[currentLang].toast_save);
+
+            if (useLocalStorage) {
+                if (pendingAction.mode === 'edit') {
                     const idx = logsData.findIndex(l => l.id === pendingAction.id);
-                    if(idx > -1) logsData[idx] = { id: docId, ...logData };
+                    if (idx > -1) logsData[idx] = { id: docId, ...logData };
                 } else {
                     logsData.push({ id: docId, ...logData });
                 }
                 saveLocalData();
-                closeModal('modal-confirm');
-                showToast(i18n[currentLang].toast_save);
                 return;
             }
             
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', docId);
+                const docRef = doc(db, COLLECTION_NAME, docId);
                 await setDoc(docRef, logData, { merge: true });
-                closeModal('modal-confirm');
-                showToast(i18n[currentLang].toast_save);
             } catch (error) { 
-                console.error("Firebase Save error:", error); 
-                alert("雲端存檔失敗！可能是權限問題，系統將繼續運作但資料可能無法同步。");
+                console.warn("Firebase Save 失敗，自動轉為本機儲存:", error);
+                enableLocalMode(error.code || error.message);
+                if (pendingAction.mode === 'edit') {
+                    const idx = logsData.findIndex(l => l.id === pendingAction.id);
+                    if (idx > -1) logsData[idx] = { id: docId, ...logData };
+                } else {
+                    logsData.push({ id: docId, ...logData });
+                }
+                saveLocalData();
             }
         };
         
@@ -607,7 +660,7 @@
         function updateDateDisplay(tab) {
             const d = tab === 'history' ? historyDate : summaryDate;
             const displayEl = document.getElementById(`${tab}-date-display`);
-            if(!displayEl) return;
+            if (!displayEl) return;
             const today = new Date();
             if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) {
                 displayEl.innerText = i18n[currentLang].today;
@@ -689,6 +742,7 @@
                 
                 html += `
                     <div class="history-item flex items-center p-4 rounded-2xl mb-2 bg-white shadow-sm border border-gray-200 active:bg-gray-50"
+                         oncontextmenu="return false;"
                          onmousedown="handleTouchStart('${log.id}')" onmouseup="handleTouchEnd()" onmouseleave="handleTouchEnd()"
                          ontouchstart="handleTouchStart('${log.id}')" ontouchend="handleTouchEnd()" ontouchmove="handleTouchEnd()">
                         <div class="w-16 text-left flex-shrink-0"><span class="text-xl font-black text-gray-400">${timeStr}</span></div>
@@ -708,6 +762,7 @@
         
         let pressTimer;
         window.handleTouchStart = function(id) {
+            if (pressTimer) clearTimeout(pressTimer);
             pressTimer = window.setTimeout(() => {
                 selectedLogId = id;
                 if (navigator.vibrate) navigator.vibrate(50);
@@ -729,23 +784,23 @@
         
         window.confirmDeleteLog = async function() {
             if (!selectedLogId) return;
+            const targetId = selectedLogId;
+            closeModal('modal-delete');
+            showToast(i18n[currentLang].toast_del);
 
-            if (useLocalStorage || !userId) {
-                logsData = logsData.filter(l => l.id !== selectedLogId);
+            if (useLocalStorage) {
+                logsData = logsData.filter(l => l.id !== targetId);
                 saveLocalData();
-                closeModal('modal-delete');
-                showToast(i18n[currentLang].toast_del);
                 return;
             }
-
             try {
-                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', selectedLogId);
+                const docRef = doc(db, COLLECTION_NAME, targetId);
                 await deleteDoc(docRef);
-                closeModal('modal-delete');
-                showToast(i18n[currentLang].toast_del);
             } catch (error) { 
-                console.error("Firebase Delete error:", error); 
-                alert("刪除失敗！");
+                console.warn("Firebase Delete 失敗，切換本機刪除:", error);
+                enableLocalMode(error.code || error.message);
+                logsData = logsData.filter(l => l.id !== targetId);
+                saveLocalData();
             }
         };
         
@@ -788,7 +843,9 @@
             
             if (activeStart) {
                 let endCalc = summaryDate.toDateString() === now.toDateString() ? now.getTime() : dayEnd.getTime();
-                totalSleepMs += (endCalc - activeStart);
+                if (endCalc > activeStart) {
+                    totalSleepMs += (endCalc - activeStart);
+                }
             }
             
             const rawSleepHours = (totalSleepMs / 3600000).toFixed(1);
@@ -894,22 +951,23 @@
             document.getElementById('modal-single-detail').classList.remove('hidden');
         };
         
+        let toastTimer = null;
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
             toast.classList.remove('hidden');
             
-            // 強制重繪
             void toast.offsetWidth;
             
             toast.classList.remove('opacity-0', 'translate-y-10');
             toast.classList.add('opacity-100', 'translate-y-0');
             
-            setTimeout(() => { 
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => { 
                 toast.classList.remove('opacity-100', 'translate-y-0');
                 toast.classList.add('opacity-0', 'translate-y-10');
                 setTimeout(() => toast.classList.add('hidden'), 300);
-            }, 2500);
+            }, 2200);
         }
         
         window.addEventListener('DOMContentLoaded', () => {
