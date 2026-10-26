@@ -1,287 +1,868 @@
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 Baby Tracker</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Noto+Sans+HK:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --pastel-bg: #fdf2f8;
-            --pastel-primary: #ec4899;
-            --pastel-primary-light: #fbcfe8;
-            --pastel-primary-dark: #be185d;
-        }
-
-        body {
-            font-family: 'Noto Sans HK', 'Varela Round', sans-serif;
-            background-color: var(--pastel-bg);
-            touch-action: pan-y;
-            -webkit-tap-highlight-color: transparent;
-            overscroll-behavior-y: contain;
-        }
-        
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
-        .pastel-header { background-color: var(--pastel-primary-light); color: var(--pastel-primary-dark); }
-        .pastel-nav { background-color: #ffffff; border-top: 2px solid var(--pastel-bg); }
-        
-        .btn-action { transition: transform 0.1s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .btn-action:active { transform: scale(0.95); }
-        
-        .btn-pee { background-color: #fef08a; border: 4px solid #fde047; color: #a16207; }
-        .btn-poo { background-color: #fed7aa; border: 4px solid #fdba74; color: #9a3412; }
-        .btn-sleep-start { background-color: #e9d5ff; border: 4px solid #d8b4fe; color: #581c87; }
-        .btn-sleep-end { background-color: #a5f3fc; border: 4px solid #67e8f9; color: #164e63; }
-        .btn-milk-card { background-color: #ffffff; border: 4px solid var(--pastel-primary-light); }
-        
-        .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
-        .btn-milk-add:active { background-color: var(--pastel-primary-light); transform: scale(0.95); }
-        
-        .btn-save { background-color: var(--pastel-primary); border: 4px solid var(--pastel-primary-dark); color: #ffffff; }
-        .btn-save:active { background-color: var(--pastel-primary-dark); }
-        
-        .filter-chip { background-color: #ffffff; color: #9ca3af; border: 2px solid #e5e7eb; }
-        .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary); border-color: var(--pastel-primary-light); }
-
-        .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
-
-        .active-tab { color: var(--pastel-primary); background-color: var(--pastel-bg); border-top: 6px solid var(--pastel-primary-light); }
-        .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
-        .modal-content { animation: popUp 0.2s ease-out forwards; }
-        
-        @keyframes toastSlide {
-            0% { transform: translate(-50%, 100%); opacity: 0; }
-            10% { transform: translate(-50%, -20px); opacity: 1; }
-            90% { transform: translate(-50%, -20px); opacity: 1; }
-            100% { transform: translate(-50%, 100%); opacity: 0; }
-        }
-        .toast-animate { animation: toastSlide 3s ease-in-out forwards; }
-
-        .flex-row-fill { flex: 1 1 0; min-height: 0; }
-
-        input[type="time"]::-webkit-calendar-picker-indicator {
-            background-color: var(--pastel-bg);
-            padding: 10px;
-            border-radius: 12px;
-            cursor: pointer;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>👶 Baby Tracker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Noto+Sans+HK:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pastel-bg: #fdf2f8;
+            --pastel-primary: #ec4899;
+            --pastel-primary-light: #fbcfe8;
+            --pastel-primary-dark: #be185d;
+        }
+        body {
+            font-family: 'Noto Sans HK', 'Varela Round', sans-serif;
+            background-color: var(--pastel-bg);
+            touch-action: pan-y;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pastel-header { background-color: var(--pastel-primary-light); color: var(--pastel-primary-dark); }
+        .pastel-nav { background-color: #ffffff; border-top: 2px solid var(--pastel-bg); }
+        
+        .btn-action { transition: transform 0.1s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-action:active { transform: scale(0.95); }
+        
+        .btn-pee { background-color: #fef08a; border: 4px solid #fde047; color: #a16207; }
+        .btn-poo { background-color: #fed7aa; border: 4px solid #fdba74; color: #9a3412; }
+        .btn-sleep-start { background-color: #e9d5ff; border: 4px solid #d8b4fe; color: #581c87; }
+        .btn-sleep-end { background-color: #a5f3fc; border: 4px solid #67e8f9; color: #164e63; }
+        .btn-milk-card { background-color: #ffffff; border: 4px solid var(--pastel-primary-light); }
+        
+        .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .btn-milk-add:active { background-color: var(--pastel-primary-light); transform: scale(0.95); }
+        
+        .btn-save { background-color: var(--pastel-primary); border: 4px solid var(--pastel-primary-dark); color: #ffffff; }
+        .btn-save:active { background-color: var(--pastel-primary-dark); }
+        
+        .filter-chip { background-color: #ffffff; color: #9ca3af; border: 2px solid #e5e7eb; }
+        .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary); border-color: var(--pastel-primary-light); }
+        .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+        .active-tab { color: var(--pastel-primary); background-color: var(--pastel-bg); border-top: 6px solid var(--pastel-primary-light); }
+        .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
+        .modal-content { animation: popUp 0.2s ease-out forwards; }
+        
+        @keyframes toastSlide {
+            0% { transform: translate(-50%, 100%); opacity: 0; }
+            10% { transform: translate(-50%, -20px); opacity: 1; }
+            90% { transform: translate(-50%, -20px); opacity: 1; }
+            100% { transform: translate(-50%, 100%); opacity: 0; }
+        }
+        .toast-animate { animation: toastSlide 3s ease-in-out forwards; }
+        .flex-row-fill { flex: 1 1 0; min-height: 0; }
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            background-color: var(--pastel-bg);
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body class="flex flex-col h-[100dvh] overflow-hidden text-gray-800">
-
-    <!-- Header -->
-    <header class="pastel-header py-3 px-4 shadow-sm z-10 flex-shrink-0 flex items-center justify-between relative">
-        <h1 class="text-2xl font-black tracking-wide flex-1 text-center"><i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span></h1>
-        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95">
-            <span id="lang-toggle-text">中/EN</span>
-        </button>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-hidden relative bg-gray-50">
-        
-        <!-- ================= TAB 1: LOG (記錄) ================= -->
-        <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
-            <div class="grid grid-cols-2 gap-3 flex-row-fill">
-                <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-droplet text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="pee">小便</span>
-                </button>
-                <button onclick="openConfirmModal('poo')" class="btn-action btn-poo rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-poop text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="poo">大便</span>
-                </button>
-                <button onclick="openConfirmModal('sleep_start')" class="btn-action btn-sleep-start rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-moon text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="sleep_start">開始睡</span>
-                </button>
-                <button onclick="openConfirmModal('sleep_end')" class="btn-action btn-sleep-end rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-sun text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="sleep_end">睡醒了</span>
-                </button>
-            </div>
-
-            <!-- Milk Intake Section -->
-            <div class="btn-milk-card rounded-[2rem] p-4 shadow-sm flex-row-fill flex flex-col justify-between">
-                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-3 active:scale-95 transition-transform w-full">
-                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-4 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
-                        <i class="fa-solid fa-bottle-water text-5xl"></i>
-                        <h2 class="text-4xl font-black" data-i18n="milk_record">飲奶記錄</h2>
-                    </div>
-                    <p class="text-gray-500 font-bold text-lg" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
-                </button>
-            </div>
-        </section>
-
-        <!-- ================= TAB 2: HISTORY (歷史) ================= -->
-        <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
-            <div class="flex items-center justify-between px-4 py-3 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
-                <button onclick="changeDate('history', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
-                <div class="flex flex-col items-center">
-                    <span id="history-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
-                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
-                </div>
-                <button onclick="changeDate('history', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
-            </div>
-
-            <div class="px-3 py-3 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_all">全部</button>
-                <button onclick="setFilter('milk')" id="filter-milk" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_milk">飲奶</button>
-                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_pee">小便</button>
-                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_poo">大便</button>
-                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_sleep">睡眠</button>
-            </div>
-            
-            <div id="history-swipe-area" class="flex-1 overflow-y-auto no-scrollbar p-3 relative bg-gray-50">
-                <div class="text-sm text-gray-400 mb-3 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
-                <div id="history-list" class="space-y-3 pb-6"></div>
-            </div>
-        </section>
-
-        <!-- ================= TAB 3: SUMMARY (總結) ================= -->
-        <section id="tab-summary" class="w-full h-full flex flex-col hidden bg-white">
-            <div class="flex items-center justify-between px-4 py-2 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
-                <button onclick="changeDate('summary', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
-                <div class="flex flex-col items-center">
-                    <span id="summary-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
-                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
-                </div>
-                <button onclick="changeDate('summary', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
-            </div>
-
-            <!-- Single Screen Area -->
-            <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
-                
-                <!-- Custom Gantt Chart (Top) -->
-                <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
-                    
-                    <!-- Backgrounds & Grids (Aligned to track width, skipping the w-10 icon column) -->
-                    <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
-                        <!-- Night Overlays (Deep blue 20% opacity) - Perfectly aligned 0-25% and 75-100% -->
-                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00-06 -->
-                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18-24 -->
-                        
-                        <!-- Vertical Dashed Lines -->
-                        <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 03:00 -->
-                        <div class="absolute top-0 bottom-0 left-[25%] border-l border-dashed border-gray-400 opacity-50 z-10"></div> <!-- 06:00 -->
-                        <div class="absolute top-0 bottom-0 left-[37.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 09:00 -->
-                        <div class="absolute top-0 bottom-0 left-[50%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 12:00 -->
-                        <div class="absolute top-0 bottom-0 left-[62.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 15:00 -->
-                        <div class="absolute top-0 bottom-0 left-[75%] border-l border-dashed border-gray-400 opacity-50 z-10"></div> <!-- 18:00 -->
-                        <div class="absolute top-0 bottom-0 left-[87.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 21:00 -->
-                    </div>
-
-                    <!-- Gantt Rows -->
-                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-milk"></div>
-                    </div>
-                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-droplet text-[#eab308] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-pee"></div>
-                    </div>
-                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-poop text-[#f97316] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-poo"></div>
-                    </div>
-                    <div class="flex-1 flex relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-moon text-[#9333ea] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-sleep"></div>
-                    </div>
-
-                    <!-- X-Axis Labels (Aligned exactly with the dashed lines above) -->
-                    <div class="h-6 bg-white flex border-t border-gray-300 z-20 font-bold text-[10px] text-gray-600 relative flex-shrink-0">
-                        <div class="w-10 flex-shrink-0 border-r border-gray-200 bg-white"></div>
-                        <div class="flex-1 relative bg-white">
-                            <span class="absolute left-0 top-1 -translate-x-1/2">00</span>
-                            <span class="absolute left-[12.5%] top-1 -translate-x-1/2">03</span>
-                            <span class="absolute left-[25%] top-1 -translate-x-1/2">06</span>
-                            <span class="absolute left-[37.5%] top-1 -translate-x-1/2">09</span>
-                            <span class="absolute left-[50%] top-1 -translate-x-1/2">12</span>
-                            <span class="absolute left-[62.5%] top-1 -translate-x-1/2">15</span>
-                            <span class="absolute left-[75%] top-1 -translate-x-1/2">18</span>
-                            <span class="absolute left-[87.5%] top-1 -translate-x-1/2">21</span>
-                            <span class="absolute left-[100%] top-1 -translate-x-1/2">24</span>
-                        </div>
-                    </div>
-
-                    <div id="summary-no-data" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30 hidden">
-                        <i class="fas fa-box-open text-4xl text-gray-300 mb-2"></i>
-                        <span class="text-gray-400 font-bold" data-i18n="no_record">暫無紀錄</span>
-                    </div>
-                </div>
-
-                <!-- Stat Cards Grid (Bottom) - Using overflow-hidden and truncate for extreme cases -->
-                <div class="grid grid-cols-4 gap-2 h-[30%] flex-shrink-0 min-h-[120px]">
-                    <div class="bg-[var(--pastel-bg)] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
-                        <i class="fa-solid fa-bottle-water text-2xl sm:text-3xl text-[var(--pastel-primary)] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_milk">總奶量</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--pastel-primary-dark)] leading-none truncate w-full text-center" id="stat-milk">0</div>
-                    </div>
-                    <div class="bg-[#fef08a] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fde047] overflow-hidden min-w-0">
-                        <i class="fas fa-droplet text-2xl sm:text-3xl text-[#a16207] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_pee">小便</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#a16207] leading-none truncate w-full text-center" id="stat-pee">0</div>
-                    </div>
-                    <div class="bg-[#fed7aa] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fdba74] overflow-hidden min-w-0">
-                        <i class="fas fa-poop text-2xl sm:text-3xl text-[#9a3412] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_poo">大便</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#9a3412] leading-none truncate w-full text-center" id="stat-poo">0</div>
-                    </div>
-                    <div class="bg-[#e9d5ff] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#d8b4fe] overflow-hidden min-w-0">
-                        <i class="fas fa-moon text-2xl sm:text-3xl text-[#581c87] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_sleep">睡眠</div>
-                        <!-- NO time units, NO overflow, dynamic truncating text -->
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#581c87] leading-none truncate w-full text-center" id="stat-sleep">0</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Bottom Navigation (Height and Fonts Huge) -->
-    <nav id="bottom-nav" class="pastel-nav w-full flex-shrink-0 flex h-[110px] pb-safe z-20 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.05)]">
-        <button onclick="switchTab('log')" id="nav-log" class="flex-1 flex flex-col items-center justify-center gap-2 active-tab transition-colors">
-            <i class="fas fa-pen-to-square text-4xl mb-1 mt-1"></i>
-            <span class="font-black text-lg" data-i18n="tab_log">記錄活動</span>
-        </button>
-        <button onclick="switchTab('history')" id="nav-history" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
-            <i class="fas fa-clock-rotate-left text-4xl mb-1 mt-1"></i>
-            <span class="font-black text-lg" data-i18n="tab_history">查看紀錄</span>
-        </button>
-        <button onclick="switchTab('summary')" id="nav-summary" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
-            <i class="fas fa-chart-pie text-4xl mb-1 mt-1"></i>
-            <span class="font-black text-lg" data-i18n="tab_summary">總結</span>
-        </button>
-    </nav>
-
-    <!-- Modal: Confirm / Edit (Massive Inputs) -->
-    <div id="modal-confirm" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center modal-overlay p-4">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] max-h-[95vh] overflow-y-auto no-scrollbar">
-            <h3 class="text-2xl font-black text-[var(--pastel-primary-dark)] text-center mb-4" id="modal-confirm-title">確認記錄</h3>
-            
-            <div class="flex items-center justify-center gap-4 mb-6">
-                <div id="modal-confirm-icon" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner"></div>
-                <div id="modal-confirm-name" class="text-3xl font-black text-gray-800"></div>
-            </div>
-
-            <!-- Native Time Picker (h-20, text-4xl) -->
-            <div class="mb-4">
-                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="time_label">選擇時間</label>
-                <input type="time" id="modal-time" class="block w-full bg-white text-4xl font-black text-gray-800 p-2 h-20 rounded-2xl text-center border-4 border-[var(--pastel-primary-light)] focus:outline-none focu
+    <!-- Header -->
+    <header class="pastel-header py-3 px-4 shadow-sm z-10 flex-shrink-0 flex items-center justify-between relative">
+        <h1 class="text-2xl font-black tracking-wide flex-1 text-center"><i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span></h1>
+        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95">
+            <span id="lang-toggle-text">中/EN</span>
+        </button>
+    </header>
+    
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative bg-gray-50">
+        
+        <!-- ================= TAB 1: LOG (記錄) ================= -->
+        <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
+            <div class="grid grid-cols-2 gap-3 flex-row-fill">
+                <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-droplet text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="pee">小便</span>
+                </button>
+                <button onclick="openConfirmModal('poo')" class="btn-action btn-poo rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-poop text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="poo">大便</span>
+                </button>
+                <button onclick="openConfirmModal('sleep_start')" class="btn-action btn-sleep-start rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-moon text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="sleep_start">開始睡</span>
+                </button>
+                <button onclick="openConfirmModal('sleep_end')" class="btn-action btn-sleep-end rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-sun text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="sleep_end">睡醒了</span>
+                </button>
+            </div>
+            
+            <!-- Milk Intake Section -->
+            <div class="btn-milk-card rounded-[2rem] p-4 shadow-sm flex-row-fill flex flex-col justify-between">
+                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-3 active:scale-95 transition-transform w-full">
+                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-4 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
+                        <i class="fa-solid fa-bottle-water text-5xl"></i>
+                        <h2 class="text-4xl font-black" data-i18n="milk_record">飲奶記錄</h2>
+                    </div>
+                    <p class="text-gray-500 font-bold text-lg" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
+                </button>
+            </div>
+        </section>
+        
+        <!-- ================= TAB 2: HISTORY (歷史) ================= -->
+        <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
+            <div class="flex items-center justify-between px-4 py-3 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
+                <button onclick="changeDate('history', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+                <div class="flex flex-col items-center">
+                    <span id="history-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
+                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
+                </div>
+                <button onclick="changeDate('history', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            
+            <div class="px-3 py-3 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_all">全部</button>
+                <button onclick="setFilter('milk')" id="filter-milk" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_milk">飲奶</button>
+                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_pee">小便</button>
+                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_poo">大便</button>
+                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_sleep">睡眠</button>
+            </div>
+            
+            <div id="history-swipe-area" class="flex-1 overflow-y-auto no-scrollbar p-3 relative bg-gray-50">
+                <div class="text-sm text-gray-400 mb-3 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
+                <div id="history-list" class="space-y-3 pb-6"></div>
+            </div>
+        </section>
+        
+        <!-- ================= TAB 3: SUMMARY (總結) ================= -->
+        <section id="tab-summary" class="w-full h-full flex flex-col hidden bg-white">
+            <div class="flex items-center justify-between px-4 py-2 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
+                <button onclick="changeDate('summary', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+                <div class="flex flex-col items-center">
+                    <span id="summary-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
+                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
+                </div>
+                <button onclick="changeDate('summary', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+            </div>
+            
+            <!-- Single Screen Area -->
+            <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
+                
+                <!-- Custom Gantt Chart (Top) -->
+                <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
+                    
+                    <!-- Backgrounds & Grids -->
+                    <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
+                        <!-- Night Overlays -->
+                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00-06 -->
+                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18-24 -->
+                        
+                        <!-- Vertical Dashed Lines -->
+                        <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div>
+                        <div class="absolute top-0 bottom-0 left-[25%] border-l border-dashed border-gray-400 opacity-50 z-10"></div>
+                        <div class="absolute top-0 bottom-0 left-[37.5%] border-l border-dashed border-gray-400 opacity-50"></div>
+                        <div class="absolute top-0 bottom-0 left-[50%] border-l border-dashed border-gray-400 opacity-50"></div>
+                        <div class="absolute top-0 bottom-0 left-[62.5%] border-l border-dashed border-gray-400 opacity-50"></div>
+                        <div class="absolute top-0 bottom-0 left-[75%] border-l border-dashed border-gray-400 opacity-50 z-10"></div>
+                        <div class="absolute top-0 bottom-0 left-[87.5%] border-l border-dashed border-gray-400 opacity-50"></div>
+                    </div>
+                    
+                    <!-- Gantt Rows -->
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-milk"></div>
+                    </div>
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-droplet text-[#eab308] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-pee"></div>
+                    </div>
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-poop text-[#f97316] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-poo"></div>
+                    </div>
+                    <div class="flex-1 flex relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-moon text-[#9333ea] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-sleep"></div>
+                    </div>
+                    
+                    <!-- X-Axis Labels -->
+                    <div class="h-6 bg-white flex border-t border-gray-300 z-20 font-bold text-[10px] text-gray-600 relative flex-shrink-0">
+                        <div class="w-10 flex-shrink-0 border-r border-gray-200 bg-white"></div>
+                        <div class="flex-1 relative bg-white">
+                            <span class="absolute left-0 top-1 -translate-x-1/2">00</span>
+                            <span class="absolute left-[12.5%] top-1 -translate-x-1/2">03</span>
+                            <span class="absolute left-[25%] top-1 -translate-x-1/2">06</span>
+                            <span class="absolute left-[37.5%] top-1 -translate-x-1/2">09</span>
+                            <span class="absolute left-[50%] top-1 -translate-x-1/2">12</span>
+                            <span class="absolute left-[62.5%] top-1 -translate-x-1/2">15</span>
+                            <span class="absolute left-[75%] top-1 -translate-x-1/2">18</span>
+                            <span class="absolute left-[87.5%] top-1 -translate-x-1/2">21</span>
+                            <span class="absolute left-[100%] top-1 -translate-x-1/2">24</span>
+                        </div>
+                    </div>
+                    <div id="summary-no-data" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30 hidden">
+                        <i class="fas fa-box-open text-4xl text-gray-300 mb-2"></i>
+                        <span class="text-gray-400 font-bold" data-i18n="no_record">暫無紀錄</span>
+                    </div>
+                </div>
+                
+                <!-- Stat Cards Grid -->
+                <div class="grid grid-cols-4 gap-2 h-[30%] flex-shrink-0 min-h-[120px]">
+                    <div class="bg-[var(--pastel-bg)] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
+                        <i class="fa-solid fa-bottle-water text-2xl sm:text-3xl text-[var(--pastel-primary)] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_milk">總奶量</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--pastel-primary-dark)] leading-none truncate w-full text-center" id="stat-milk">0</div>
+                    </div>
+                    <div class="bg-[#fef08a] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fde047] overflow-hidden min-w-0">
+                        <i class="fas fa-droplet text-2xl sm:text-3xl text-[#a16207] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_pee">小便</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#a16207] leading-none truncate w-full text-center" id="stat-pee">0</div>
+                    </div>
+                    <div class="bg-[#fed7aa] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fdba74] overflow-hidden min-w-0">
+                        <i class="fas fa-poop text-2xl sm:text-3xl text-[#9a3412] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_poo">大便</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#9a3412] leading-none truncate w-full text-center" id="stat-poo">0</div>
+                    </div>
+                    <div class="bg-[#e9d5ff] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#d8b4fe] overflow-hidden min-w-0">
+                        <i class="fas fa-moon text-2xl sm:text-3xl text-[#581c87] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_sleep">睡眠</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#581c87] leading-none truncate w-full text-center" id="stat-sleep">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="pastel-nav w-full flex-shrink-0 flex h-[110px] pb-safe z-20 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('log')" id="nav-log" class="flex-1 flex flex-col items-center justify-center gap-2 active-tab transition-colors">
+            <i class="fas fa-pen-to-square text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_log">記錄活動</span>
+        </button>
+        <button onclick="switchTab('history')" id="nav-history" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
+            <i class="fas fa-clock-rotate-left text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_history">查看紀錄</span>
+        </button>
+        <button onclick="switchTab('summary')" id="nav-summary" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
+            <i class="fas fa-chart-pie text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_summary">總結</span>
+        </button>
+    </nav>
+    
+    <!-- Modal: Confirm / Edit -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center modal-overlay p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] max-h-[95vh] overflow-y-auto no-scrollbar">
+            <h3 class="text-2xl font-black text-[var(--pastel-primary-dark)] text-center mb-4" id="modal-confirm-title">確認記錄</h3>
+            
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div id="modal-confirm-icon" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner"></div>
+                <div id="modal-confirm-name" class="text-3xl font-black text-gray-800"></div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="time_label">選擇時間</label>
+                <input type="time" id="modal-time" class="block w-full bg-white text-4xl font-black text-gray-800 p-2 h-20 rounded-2xl text-center border-4 border-[var(--pastel-primary-light)] focus:outline-none focus:border-[var(--pastel-primary)] shadow-inner">
+            </div>
+            
+            <div id="modal-amount-container" class="mb-6 hidden">
+                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="amount_label">奶量 (ml)</label>
+                <input type="number" id="modal-amount-input" class="block w-full bg-white text-4xl font-black text-center text-gray-800 p-2 h-20 rounded-2xl border-4 border-[var(--pastel-primary-light)] focus:outline-none focus:border-[var(--pastel-primary)] shadow-inner" value="0" min="0">
+                
+                <div class="flex justify-between gap-2 mt-4">
+                    <button onclick="changeModalAmount(10)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+10</button>
+                    <button onclick="changeModalAmount(50)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+50</button>
+                    <button onclick="changeModalAmount(100)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+100</button>
+                    <button onclick="setModalAmount(0)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-lg sm:text-xl !bg-gray-200 !text-gray-700 !border-gray-300 whitespace-nowrap" data-i18n="reset">清零</button>
+                </div>
+            </div>
+            
+            <div class="flex gap-3 mt-4 pt-2">
+                <button onclick="closeModal('modal-confirm')" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl text-2xl font-bold active:bg-gray-300">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmSaveLog()" class="flex-1 btn-save py-4 rounded-xl text-2xl font-black shadow-md">
+                    <i class="fas fa-check"></i> <span data-i18n="confirm">確認</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: History Action (Long Press) -->
+    <div id="modal-action" class="fixed inset-0 bg-black/40 z-[60] hidden flex items-end justify-center modal-overlay">
+        <div class="bg-white w-full rounded-t-[2rem] p-6 shadow-2xl modal-content flex flex-col pb-8 border-t-4 border-[var(--pastel-primary-light)]">
+            <h3 class="text-xl font-bold text-gray-500 text-center mb-4" data-i18n="action_title">選擇操作</h3>
+            <button onclick="initiateEditLog()" class="w-full bg-[var(--pastel-bg)] text-[var(--pastel-primary)] py-4 rounded-2xl text-2xl font-black mb-3 active:bg-[var(--pastel-primary-light)] shadow-sm border-2 border-[var(--pastel-primary-light)]">
+                <i class="fas fa-pen"></i> <span data-i18n="edit">修改記錄</span>
+            </button>
+            <button onclick="initiateDeleteLog()" class="w-full bg-[#fee2e2] text-[#b91c1c] py-4 rounded-2xl text-2xl font-black mb-4 active:bg-[#fecaca] shadow-sm border-2 border-red-200">
+                <i class="fas fa-trash"></i> <span data-i18n="delete">刪除記錄</span>
+            </button>
+            <button onclick="closeModal('modal-action')" class="w-full bg-gray-200 text-gray-700 py-4 rounded-2xl text-xl font-bold active:bg-gray-300">
+                <span data-i18n="cancel">取消</span>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal: Delete Confirm -->
+    <div id="modal-delete" class="fixed inset-0 bg-black/60 z-[70] hidden flex items-center justify-center modal-overlay">
+        <div class="bg-white w-[85%] max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content text-center border-4 border-red-300">
+            <i class="fas fa-triangle-exclamation text-6xl text-red-500 mb-4 block"></i>
+            <h3 class="text-3xl font-black text-gray-800 mb-2" data-i18n="delete_confirm_title">確定刪除？</h3>
+            <p class="text-gray-500 mb-6 text-xl font-bold" data-i18n="delete_confirm_msg">刪除後將無法恢復。</p>
+            <div class="flex gap-3">
+                <button onclick="closeModal('modal-delete')" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl text-xl font-bold">
+                    <span data-i18n="cancel">取消</span>
+                </button>
+                <button onclick="confirmDeleteLog()" class="flex-1 bg-red-500 text-white py-3 rounded-xl text-xl font-bold shadow-md active:bg-red-600">
+                    <span data-i18n="delete_btn">確定刪除</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal: Single Gantt Item Detail -->
+    <div id="modal-single-detail" class="fixed inset-0 bg-black/50 z-[80] hidden flex items-center justify-center modal-overlay p-4">
+        <div class="bg-white w-full max-w-xs rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] text-center relative">
+            <button onclick="closeModal('modal-single-detail')" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-xl active:scale-95"><i class="fas fa-times"></i></button>
+            
+            <div id="single-detail-icon" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-4"></div>
+            <h3 id="single-detail-title" class="text-3xl font-black text-gray-800 mb-2"></h3>
+            <p id="single-detail-time" class="text-2xl font-bold text-gray-500 mb-3"></p>
+            <p id="single-detail-extra" class="text-4xl font-black text-[var(--pastel-primary)] mb-1"></p>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-32 left-1/2 transform -translate-x-1/2 hidden z-[100] pointer-events-none">
+        <div class="bg-gray-800 text-white px-8 py-4 rounded-full shadow-lg flex items-center gap-3">
+            <i class="fas fa-circle-check text-2xl text-green-400"></i>
+            <span id="toast-message" class="text-xl font-bold whitespace-nowrap">記錄成功!</span>
+        </div>
+    </div>
+    
+    <!-- App Scripts (Firebase Cloud-Based) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // =========================================================================
+        // FIREBASE CONFIGURATION
+        // =========================================================================
+        const manualFirebaseConfig = {
+            apiKey: "AIzaSyDyHrDgTBJXFTDaZ17rqJyjkSp-cvb86_Y",
+            authDomain: "baby-tracker-webapp.firebaseapp.com",
+            projectId: "baby-tracker-webapp",
+            storageBucket: "baby-tracker-webapp.firebasestorage.app",
+            messagingSenderId: "341594774394",
+            appId: "1:341594774394:web:e4c029e9de20dd8c8e54c3"
+        };
+        
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : manualFirebaseConfig;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'homecare-base';
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        let userId = null;
+        let logsData = [];
+        let pendingAction = null; 
+        let selectedLogId = null; 
+        let currentLang = 'zh';
+        let currentFilter = 'all'; 
+        
+        let historyDate = new Date();
+        let summaryDate = new Date(); 
+        
+        const i18n = {
+            zh: {
+                title: "寶寶記錄", langToggle: "中/EN", pee: "小便", poo: "大便",
+                sleep_start: "開始睡", sleep_end: "睡醒了", milk: "飲奶", milk_record: "飲奶記錄",
+                click_to_add_milk: "點擊此處記錄奶量", tab_log: "記錄活動", tab_history: "查看紀錄", tab_summary: "總結",
+                history_hint: "💡 長按記錄可修改或刪除", time_label: "選擇時間", amount_label: "奶量 (ml)",
+                cancel: "取消", confirm: "確認", action_title: "選擇操作", edit: "修改記錄", delete: "刪除記錄", 
+                delete_confirm_title: "確定刪除？", delete_confirm_msg: "刪除後將無法恢復。", delete_btn: "確定刪除",
+                no_record: "暫無紀錄", toast_save: "儲存成功！", toast_del: "已刪除", confirm_title_add: "新增記錄", confirm_title_edit: "修改記錄",
+                filter_all: "全部", filter_milk: "飲奶", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠",
+                total_milk: "總奶量", total_pee: "小便", total_poo: "大便", total_sleep: "睡眠",
+                swipe_hint: "左右滑動切換日期", today: "今天", gap_prefix: "與上次相距 ", gap_duration: "長度: ", gap_hr: "小時", gap_min: "分",
+                to: "至", reset: "清零"
+            },
+            en: {
+                title: "Baby Tracker", langToggle: "EN/中", pee: "Wet", poo: "Dirty",
+                sleep_start: "Sleep Start", sleep_end: "Wake Up", milk: "Feeding", milk_record: "Milk Log",
+                click_to_add_milk: "Tap to record milk", tab_log: "Record", tab_history: "History", tab_summary: "Summary",
+                history_hint: "💡 Long press to edit/delete", time_label: "Select Time", amount_label: "Amount (ml)",
+                cancel: "Cancel", confirm: "Confirm", action_title: "Select Action", edit: "Edit", delete: "Delete", 
+                delete_confirm_title: "Delete?", delete_confirm_msg: "Cannot be undone.", delete_btn: "Delete",
+                no_record: "No records", toast_save: "Saved!", toast_del: "Deleted", confirm_title_add: "New Record", confirm_title_edit: "Edit Record",
+                filter_all: "All", filter_milk: "Milk", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep",
+                total_milk: "Total Milk", total_pee: "Wet", total_poo: "Dirty", total_sleep: "Sleeps",
+                swipe_hint: "Swipe to change date", today: "Today", gap_prefix: "Since last: ", gap_duration: "Duration: ", gap_hr: "h ", gap_min: "m",
+                to: "to", reset: "Reset"
+            }
+        };
+        
+        const EVENT_DICTIONARY = {
+            'pee': { key: 'pee', icon: 'fa-droplet', colorClass: 'bg-[#fef08a] text-[#a16207]', borderClass: 'border-[#fde047]' },
+            'poo': { key: 'poo', icon: 'fa-poop', colorClass: 'bg-[#fed7aa] text-[#9a3412]', borderClass: 'border-[#fdba74]' },
+            'sleep_start': { key: 'sleep_start', icon: 'fa-moon', colorClass: 'bg-[#e9d5ff] text-[#581c87]', borderClass: 'border-[#d8b4fe]' },
+            'sleep_end': { key: 'sleep_end', icon: 'fa-sun', colorClass: 'bg-[#a5f3fc] text-[#164e63]', borderClass: 'border-[#67e8f9]' },
+            'milk': { key: 'milk', icon: 'fa-bottle-water', colorClass: 'bg-[var(--pastel-bg)] text-[var(--pastel-primary)]', borderClass: 'border-[var(--pastel-primary-light)]' }
+        };
+        
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined') {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                subscribeToData();
+            } catch (error) {
+                console.error("Firebase Auth Error:", error);
+            }
+        }
+        
+        function subscribeToData() {
+            if (!userId) return;
+            const logsRef = collection(db, 'artifacts', appId, 'users', userId, 'logs');
+            
+            onSnapshot(logsRef, (snapshot) => {
+                logsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+                if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+            }, (error) => {
+                console.error("Firebase Snapshot Error:", error);
+            });
+        }
+        
+        window.toggleLanguage = function() {
+            currentLang = currentLang === 'zh' ? 'en' : 'zh';
+            document.getElementById('lang-toggle-text').innerText = currentLang === 'zh' ? '中/EN' : 'EN/中';
+            updateTexts();
+            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+            if(!document.getElementById('modal-confirm').classList.contains('hidden') && pendingAction){
+               document.getElementById('modal-confirm-name').innerText = i18n[currentLang][EVENT_DICTIONARY[pendingAction.type].key];
+            }
+        };
+        
+        function updateTexts() {
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (i18n[currentLang][key]) el.innerHTML = i18n[currentLang][key];
+            });
+            updateDateDisplay('history');
+            updateDateDisplay('summary');
+        }
+        
+        window.switchTab = function(tabName) {
+            ['log', 'history', 'summary'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`nav-${t}`).className = "flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors";
+            });
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`nav-${tabName}`).className = "flex-1 flex flex-col items-center justify-center gap-2 active-tab transition-colors";
+            if (tabName === 'history') { historyDate = new Date(); renderHistory(); }
+            if (tabName === 'summary') { summaryDate = new Date(); updateSummaryUI(); }
+        };
+        
+        window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
+        
+        window.changeModalAmount = function(delta) {
+            const input = document.getElementById('modal-amount-input');
+            let val = parseInt(input.value) || 0;
+            val += delta;
+            if (val < 0) val = 0;
+            input.value = val;
+        };
+        
+        window.setModalAmount = function(val) {
+            document.getElementById('modal-amount-input').value = val;
+        };
+        
+        window.openConfirmModal = function(type, amount = 0, mode = 'create', existingLog = null) {
+            if (navigator.vibrate) navigator.vibrate(50);
+            pendingAction = { type, mode, id: existingLog?.id };
+            const def = EVENT_DICTIONARY[type];
+            document.getElementById('modal-confirm-name').innerText = i18n[currentLang][def.key];
+            
+            const iconContainer = document.getElementById('modal-confirm-icon');
+            iconContainer.className = `w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-inner border-4 ${def.borderClass} ${def.colorClass}`;
+            iconContainer.innerHTML = `<i class="fa-solid ${def.icon}"></i>`;
+            
+            document.getElementById('modal-confirm-title').innerText = mode === 'create' ? i18n[currentLang].confirm_title_add : i18n[currentLang].confirm_title_edit;
+            
+            const baseTime = existingLog ? new Date(existingLog.timestamp) : new Date();
+            const hrsStr = baseTime.getHours().toString().padStart(2, '0');
+            const minsStr = baseTime.getMinutes().toString().padStart(2, '0');
+            
+            document.getElementById('modal-time').value = `${hrsStr}:${minsStr}`;
+            
+            const amtContainer = document.getElementById('modal-amount-container');
+            if (type === 'milk') {
+                amtContainer.classList.remove('hidden');
+                document.getElementById('modal-amount-input').value = existingLog ? existingLog.amount : (amount || 0);
+            } else {
+                amtContainer.classList.add('hidden');
+            }
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        };
+        
+        window.confirmSaveLog = async function() {
+            if (!pendingAction || !userId) return;
+            const timeVal = document.getElementById('modal-time').value;
+            if (!timeVal) return;
+            
+            const [hr, mn] = timeVal.split(':').map(Number);
+            const baseTime = pendingAction.mode === 'edit' ? new Date(logsData.find(l=>l.id === pendingAction.id).timestamp) : new Date();
+            baseTime.setHours(hr, mn, 0, 0);
+            
+            let finalAmount = 0;
+            if (pendingAction.type === 'milk') finalAmount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
+            
+            const logData = { type: pendingAction.type, timestamp: baseTime.getTime(), amount: finalAmount };
+            
+            try {
+                const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substr(2, 5);
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', docId);
+                
+                await setDoc(docRef, logData, { merge: true });
+                closeModal('modal-confirm');
+                showToast(i18n[currentLang].toast_save);
+            } catch (error) { console.error("Firebase Save error:", error); }
+        };
+        
+        function getLogsForDay(dateObj) {
+            const startOfDay = new Date(dateObj);
+            startOfDay.setHours(0,0,0,0);
+            const endOfDay = new Date(dateObj);
+            endOfDay.setHours(23,59,59,999);
+            return logsData.filter(log => log.timestamp >= startOfDay.getTime() && log.timestamp <= endOfDay.getTime());
+        }
+        
+        window.changeDate = function(tab, deltaDays) {
+            if (tab === 'history') {
+                historyDate.setDate(historyDate.getDate() + deltaDays);
+                renderHistory();
+            } else {
+                summaryDate.setDate(summaryDate.getDate() + deltaDays);
+                updateSummaryUI();
+            }
+        };
+        
+        function updateDateDisplay(tab) {
+            const d = tab === 'history' ? historyDate : summaryDate;
+            const displayEl = document.getElementById(`${tab}-date-display`);
+            if(!displayEl) return;
+            const today = new Date();
+            if (d.getDate() === today.getDate() && d.getMonth() === today.getMonth() && d.getFullYear() === today.getFullYear()) {
+                displayEl.innerText = i18n[currentLang].today;
+            } else {
+                displayEl.innerText = currentLang === 'zh' ? `${d.getMonth() + 1}月${d.getDate()}日` : `${d.getDate()}/${d.getMonth() + 1}`;
+            }
+        }
+        
+        function setupSwipeGestures(elementId, tab) {
+            let touchstartX = 0;
+            let touchendX = 0;
+            const area = document.getElementById(elementId);
+            
+            area.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
+            area.addEventListener('touchend', e => {
+                touchendX = e.changedTouches[0].screenX;
+                if (touchendX < touchstartX - 70) window.changeDate(tab, 1);
+                if (touchendX > touchstartX + 70) window.changeDate(tab, -1);
+            }, {passive: true});
+        }
+        
+        function getGapText(log) {
+            const sorted = [...logsData].sort((a, b) => b.timestamp - a.timestamp);
+            const idx = sorted.findIndex(l => l.id === log.id);
+            if (idx === -1) return '';
+            let prevLog = null;
+            if (log.type === 'sleep_end') prevLog = sorted.slice(idx + 1).find(l => l.type === 'sleep_start');
+            else if (log.type === 'sleep_start') prevLog = sorted.slice(idx + 1).find(l => l.type === 'sleep_end');
+            else prevLog = sorted.slice(idx + 1).find(l => l.type === log.type);
+            
+            if (!prevLog) return '';
+            const diffMs = log.timestamp - prevLog.timestamp;
+            if (diffMs < 0) return '';
+            
+            const diffHrs = Math.floor(diffMs / 3600000);
+            const diffMins = Math.floor((diffMs % 3600000) / 60000);
+            if (diffHrs === 0 && diffMins === 0) return ''; 
+            
+            const hStr = diffHrs > 0 ? `${diffHrs}${i18n[currentLang].gap_hr}` : '';
+            const mStr = `${diffMins}${i18n[currentLang].gap_min}`;
+            return log.type === 'sleep_end' ? `${i18n[currentLang].gap_duration}${hStr}${mStr}` : `${i18n[currentLang].gap_prefix}${hStr}${mStr}`;
+        }
+        
+        window.setFilter = function(f) {
+            currentFilter = f;
+            document.querySelectorAll('.filter-chip').forEach(el => {
+                el.classList.remove('active', 'text-[var(--pastel-primary)]', 'bg-[var(--pastel-bg)]', 'border-[var(--pastel-primary-light)]');
+                el.classList.add('text-[#9ca3af]', 'bg-white', 'border-[#e5e7eb]');
+            });
+            const activeBtn = document.getElementById(`filter-${f}`);
+            activeBtn.classList.remove('text-[#9ca3af]', 'bg-white', 'border-[#e5e7eb]');
+            activeBtn.classList.add('active', 'text-[var(--pastel-primary)]', 'bg-[var(--pastel-bg)]', 'border-[var(--pastel-primary-light)]');
+            renderHistory();
+        };
+        
+        function renderHistory() {
+            updateDateDisplay('history');
+            const container = document.getElementById('history-list');
+            
+            let dayLogs = getLogsForDay(historyDate);
+            dayLogs.sort((a, b) => b.timestamp - a.timestamp);
+            if (currentFilter !== 'all') {
+                dayLogs = dayLogs.filter(log => {
+                    if (currentFilter === 'sleep') return log.type === 'sleep_start' || log.type === 'sleep_end';
+                    return log.type === currentFilter;
+                });
+            }
+            if (dayLogs.length === 0) {
+                container.innerHTML = `<div class="text-center py-10 text-xl font-bold text-gray-400 flex flex-col items-center gap-3"><i class="fas fa-inbox text-5xl"></i><span>${i18n[currentLang].no_record}</span></div>`;
+                return;
+            }
+            let html = '';
+            dayLogs.forEach(log => {
+                const d = new Date(log.timestamp);
+                const timeStr = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+                const def = EVENT_DICTIONARY[log.type];
+                let extraInfo = log.type === 'milk' && log.amount ? `<span class="ml-auto text-2xl font-black text-[var(--pastel-primary)]">${log.amount} <span class="text-sm">ml</span></span>` : '';
+                let gapText = getGapText(log);
+                let gapHtml = gapText ? `<div class="text-xs font-bold text-gray-400 mt-1">${gapText}</div>` : '';
+                
+                html += `
+                    <div class="history-item flex items-center p-4 rounded-2xl mb-2 bg-white shadow-sm border border-gray-200 active:bg-gray-50"
+                         onmousedown="handleTouchStart('${log.id}')" onmouseup="handleTouchEnd()" onmouseleave="handleTouchEnd()"
+                         ontouchstart="handleTouchStart('${log.id}')" ontouchend="handleTouchEnd()" ontouchmove="handleTouchEnd()">
+                        <div class="w-16 text-left flex-shrink-0"><span class="text-xl font-black text-gray-400">${timeStr}</span></div>
+                        <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-inner flex-shrink-0 border-2 ${def.borderClass} ${def.colorClass}">
+                            <i class="fa-solid ${def.icon} text-xl"></i>
+                        </div>
+                        <div class="flex flex-col flex-1">
+                            <span class="text-xl font-black text-gray-700 leading-tight">${i18n[currentLang][def.key]}</span>
+                            ${gapHtml}
+                        </div>
+                        ${extraInfo}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+        
+        let pressTimer;
+        window.handleTouchStart = function(id) {
+            pressTimer = window.setTimeout(() => {
+                selectedLogId = id;
+                if (navigator.vibrate) navigator.vibrate(50);
+                document.getElementById('modal-action').classList.remove('hidden');
+            }, 600);
+        };
+        
+        window.handleTouchEnd = function() { if (pressTimer) clearTimeout(pressTimer); };
+        
+        window.initiateEditLog = function() {
+            closeModal('modal-action');
+            const log = logsData.find(l => l.id === selectedLogId);
+            if (log) openConfirmModal(log.type, log.amount, 'edit', log);
+        };
+        
+        window.initiateDeleteLog = function() {
+            closeModal('modal-action');
+            document.getElementById('modal-delete').classList.remove('hidden');
+        };
+        
+        window.confirmDeleteLog = async function() {
+            if (!selectedLogId || !userId) return;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', selectedLogId);
+                await deleteDoc(docRef);
+                closeModal('modal-delete');
+                showToast(i18n[currentLang].toast_del);
+            } catch (error) { console.error("Firebase Delete error:", error); }
+        };
+        
+        function updateSummaryUI() {
+            updateDateDisplay('summary');
+            let dayLogs = getLogsForDay(summaryDate);
+            dayLogs.sort((a, b) => a.timestamp - b.timestamp);
+            
+            let totalMilk = 0, countPee = 0, countPoo = 0;
+            
+            dayLogs.forEach(log => {
+                if (log.type === 'milk') totalMilk += log.amount;
+                else if (log.type === 'pee') countPee++;
+                else if (log.type === 'poo') countPoo++;
+            });
+            
+            document.getElementById('stat-milk').innerText = totalMilk;
+            document.getElementById('stat-pee').innerText = countPee;
+            document.getElementById('stat-poo').innerText = countPoo;
+            
+            let totalSleepMs = 0;
+            let daySleepLogs = dayLogs.filter(l => l.type === 'sleep_start' || l.type === 'sleep_end');
+            
+            let activeStart = null;
+            let dayStart = new Date(summaryDate); dayStart.setHours(0,0,0,0);
+            let dayEnd = new Date(summaryDate); dayEnd.setHours(23,59,59,999);
+            let now = new Date();
+            
+            daySleepLogs.forEach(log => {
+                if (log.type === 'sleep_start') {
+                    activeStart = log.timestamp;
+                } else if (log.type === 'sleep_end') {
+                    if (activeStart) {
+                        totalSleepMs += (log.timestamp - activeStart);
+                        activeStart = null;
+                    } else {
+                        totalSleepMs += (log.timestamp - dayStart.getTime());
+                    }
+                }
+            });
+            
+            if (activeStart) {
+                let endCalc = summaryDate.toDateString() === now.toDateString() ? now.getTime() : dayEnd.getTime();
+                totalSleepMs += (endCalc - activeStart);
+            }
+            
+            const rawSleepHours = (totalSleepMs / 3600000).toFixed(1);
+            const formattedSleepHours = parseFloat(rawSleepHours);
+            document.getElementById('stat-sleep').innerText = formattedSleepHours;
+            
+            const hasData = dayLogs.length > 0;
+            document.getElementById('summary-no-data').style.display = hasData ? 'none' : 'flex';
+            
+            drawGanttChart(dayLogs);
+        }
+        
+        function drawGanttChart(dayLogs) {
+            const tracks = {
+                'milk': document.getElementById('track-milk'),
+                'pee': document.getElementById('track-pee'),
+                'poo': document.getElementById('track-poo'),
+                'sleep': document.getElementById('track-sleep')
+            };
+            Object.values(tracks).forEach(t => t.innerHTML = '');
+            let activeSleep = null;
+            
+            dayLogs.forEach(log => {
+                const date = new Date(log.timestamp);
+                const percent = ((date.getHours() + date.getMinutes() / 60) / 24) * 100;
+                if (log.type === 'milk') {
+                    addGanttDot(tracks.milk, percent, log, 'bg-[var(--pastel-primary-light)] border-[var(--pastel-primary)]');
+                } else if (log.type === 'pee') {
+                    addGanttDot(tracks.pee, percent, log, 'bg-[#fef08a] border-[#eab308]');
+                } else if (log.type === 'poo') {
+                    addGanttDot(tracks.poo, percent, log, 'bg-[#fed7aa] border-[#f97316]');
+                } else if (log.type === 'sleep_start') {
+                    activeSleep = { log: log, startPercent: percent };
+                } else if (log.type === 'sleep_end') {
+                    if (activeSleep) {
+                        addGanttBar(tracks.sleep, activeSleep.startPercent, percent, activeSleep.log, log);
+                        activeSleep = null;
+                    } else {
+                        addGanttBar(tracks.sleep, 0, percent, {timestamp: new Date(summaryDate).setHours(0,0,0,0), type: 'sleep_start'}, log);
+                    }
+                }
+            });
+            
+            if (activeSleep) {
+                const today = new Date();
+                let endPercent = 100;
+                if (summaryDate.getDate() === today.getDate() && summaryDate.getMonth() === today.getMonth()) {
+                    endPercent = ((today.getHours() + today.getMinutes() / 60) / 24) * 100;
+                }
+                addGanttBar(tracks.sleep, activeSleep.startPercent, endPercent, activeSleep.log, null);
+            }
+        }
+        
+        function addGanttDot(container, percent, log, colorClasses) {
+            const div = document.createElement('div');
+            div.className = `absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-[2px] shadow-sm z-20 cursor-pointer ${colorClasses}`;
+            div.style.left = `calc(${percent}% - 8px)`;
+            div.onclick = (e) => { e.stopPropagation(); openSingleDetail(log); };
+            container.appendChild(div);
+        }
+        
+        function addGanttBar(container, startPercent, endPercent, logStart, logEnd) {
+            const div = document.createElement('div');
+            div.className = `absolute top-1/2 -translate-y-1/2 h-[60%] rounded-full bg-[#d8b4fe] border-2 border-[#9333ea] shadow-sm z-10 opacity-90 cursor-pointer`;
+            div.style.left = `${startPercent}%`;
+            let width = endPercent - startPercent;
+            if (width < 2) width = 2; 
+            div.style.width = `${width}%`;
+            div.onclick = (e) => { e.stopPropagation(); openSingleDetail(logStart, logEnd); };
+            container.appendChild(div);
+        }
+        
+        window.openSingleDetail = function(log, logEnd = null) {
+            const def = EVENT_DICTIONARY[log.type] || EVENT_DICTIONARY['sleep_start']; 
+            const iconContainer = document.getElementById('single-detail-icon');
+            iconContainer.className = `w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-4 border-4 ${def.borderClass} ${def.colorClass}`;
+            iconContainer.innerHTML = `<i class="fa-solid ${def.icon}"></i>`;
+            
+            document.getElementById('single-detail-title').innerText = i18n[currentLang][def.key];
+            
+            const dStart = new Date(log.timestamp);
+            const tStart = `${dStart.getHours().toString().padStart(2,'0')}:${dStart.getMinutes().toString().padStart(2,'0')}`;
+            
+            let timeStr = tStart;
+            let extraStr = '';
+            
+            if (log.type === 'milk' && log.amount) {
+                extraStr = `${log.amount} ml`;
+            } else if (log.type === 'sleep_start') {
+                if (logEnd) {
+                    const dEnd = new Date(logEnd.timestamp);
+                    const tEnd = `${dEnd.getHours().toString().padStart(2,'0')}:${dEnd.getMinutes().toString().padStart(2,'0')}`;
+                    timeStr = `${tStart} ${i18n[currentLang].to} ${tEnd}`;
+                    
+                    const diffMs = logEnd.timestamp - log.timestamp;
+                    const h = Math.floor(diffMs / 3600000);
+                    const m = Math.floor((diffMs % 3600000) / 60000);
+                    extraStr = `${h}${i18n[currentLang].gap_hr}${m}${i18n[currentLang].gap_min}`;
+                } else {
+                    timeStr = `${tStart} - (進行中)`;
+                }
+            }
+            document.getElementById('single-detail-time').innerText = timeStr;
+            document.getElementById('single-detail-extra').innerText = extraStr;
+            
+            document.getElementById('modal-single-detail').classList.remove('hidden');
+        };
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('hidden', 'toast-animate');
+            void toast.offsetWidth; 
+            toast.classList.add('toast-animate');
+            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+        }
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            initAuth();
+            setupSwipeGestures('history-swipe-area', 'history');
+            setupSwipeGestures('summary-swipe-area', 'summary');
+            updateTexts();
+        });
+    </script>
+</body>
+</html>
