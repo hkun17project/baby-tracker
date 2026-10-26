@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>👶 Baby Tracker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Varela+Round&family=Noto+Sans+HK:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pastel-bg: #fdf2f8;
+            --pastel-primary: #ec4899;
+            --pastel-primary-light: #fbcfe8;
+            --pastel-primary-dark: #be185d;
+        }
+
+        body {
+            font-family: 'Noto Sans HK', 'Varela Round', sans-serif;
+            background-color: var(--pastel-bg);
+            touch-action: pan-y;
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: contain;
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        .pastel-header { background-color: var(--pastel-primary-light); color: var(--pastel-primary-dark); }
+        .pastel-nav { background-color: #ffffff; border-top: 2px solid var(--pastel-bg); }
+        
+        .btn-action { transition: transform 0.1s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-action:active { transform: scale(0.95); }
+        
+        .btn-pee { background-color: #fef08a; border: 4px solid #fde047; color: #a16207; }
+        .btn-poo { background-color: #fed7aa; border: 4px solid #fdba74; color: #9a3412; }
+        .btn-sleep-start { background-color: #e9d5ff; border: 4px solid #d8b4fe; color: #581c87; }
+        .btn-sleep-end { background-color: #a5f3fc; border: 4px solid #67e8f9; color: #164e63; }
+        .btn-milk-card { background-color: #ffffff; border: 4px solid var(--pastel-primary-light); }
+        
+        .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05);}
+        .btn-milk-add:active { background-color: var(--pastel-primary-light); transform: scale(0.95); }
+        
+        .btn-save { background-color: var(--pastel-primary); border: 4px solid var(--pastel-primary-dark); color: #ffffff; }
+        .btn-save:active { background-color: var(--pastel-primary-dark); }
+        
+        .filter-chip { background-color: #ffffff; color: #9ca3af; border: 2px solid #e5e7eb; }
+        .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary); border-color: var(--pastel-primary-light); }
+
+        .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+
+        .active-tab { color: var(--pastel-primary); background-color: var(--pastel-bg); border-top: 6px solid var(--pastel-primary-light); }
+        .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
+        .modal-content { animation: popUp 0.2s ease-out forwards; }
+        
+        @keyframes toastSlide {
+            0% { transform: translate(-50%, 100%); opacity: 0; }
+            10% { transform: translate(-50%, -20px); opacity: 1; }
+            90% { transform: translate(-50%, -20px); opacity: 1; }
+            100% { transform: translate(-50%, 100%); opacity: 0; }
+        }
+        .toast-animate { animation: toastSlide 3s ease-in-out forwards; }
+
+        .flex-row-fill { flex: 1 1 0; min-height: 0; }
+
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            background-color: var(--pastel-bg);
+            padding: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="flex flex-col h-[100dvh] overflow-hidden text-gray-800">
+
+    <!-- Header -->
+    <header class="pastel-header py-3 px-4 shadow-sm z-10 flex-shrink-0 flex items-center justify-between relative">
+        <h1 class="text-2xl font-black tracking-wide flex-1 text-center"><i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span></h1>
+        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95">
+            <span id="lang-toggle-text">中/EN</span>
+        </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-hidden relative bg-gray-50">
+        
+        <!-- ================= TAB 1: LOG (記錄) ================= -->
+        <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
+            <div class="grid grid-cols-2 gap-3 flex-row-fill">
+                <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-droplet text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="pee">小便</span>
+                </button>
+                <button onclick="openConfirmModal('poo')" class="btn-action btn-poo rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-poop text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="poo">大便</span>
+                </button>
+                <button onclick="openConfirmModal('sleep_start')" class="btn-action btn-sleep-start rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-moon text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="sleep_start">開始睡</span>
+                </button>
+                <button onclick="openConfirmModal('sleep_end')" class="btn-action btn-sleep-end rounded-[2rem] flex flex-col items-center justify-center gap-2">
+                    <i class="fas fa-sun text-5xl"></i>
+                    <span class="text-3xl font-black" data-i18n="sleep_end">睡醒了</span>
+                </button>
+            </div>
+
+            <!-- Milk Intake Section -->
+            <div class="btn-milk-card rounded-[2rem] p-4 shadow-sm flex-row-fill flex flex-col justify-between">
+                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-3 active:scale-95 transition-transform w-full">
+                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-4 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
+                        <i class="fa-solid fa-bottle-water text-5xl"></i>
+                        <h2 class="text-4xl font-black" data-i18n="milk_record">飲奶記錄</h2>
+                    </div>
+                    <p class="text-gray-500 font-bold text-lg" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= TAB 2: HISTORY (歷史) ================= -->
+        <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
+            <div class="flex items-center justify-between px-4 py-3 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
+                <button onclick="changeDate('history', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+                <div class="flex flex-col items-center">
+                    <span id="history-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
+                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
+                </div>
+                <button onclick="changeDate('history', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <div class="px-3 py-3 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_all">全部</button>
+                <button onclick="setFilter('milk')" id="filter-milk" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_milk">飲奶</button>
+                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_pee">小便</button>
+                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_poo">大便</button>
+                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_sleep">睡眠</button>
+            </div>
+            
+            <div id="history-swipe-area" class="flex-1 overflow-y-auto no-scrollbar p-3 relative bg-gray-50">
+                <div class="text-sm text-gray-400 mb-3 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
+                <div id="history-list" class="space-y-3 pb-6"></div>
+            </div>
+        </section>
+
+        <!-- ================= TAB 3: SUMMARY (總結) ================= -->
+        <section id="tab-summary" class="w-full h-full flex flex-col hidden bg-white">
+            <div class="flex items-center justify-between px-4 py-2 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
+                <button onclick="changeDate('summary', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+                <div class="flex flex-col items-center">
+                    <span id="summary-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
+                    <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
+                </div>
+                <button onclick="changeDate('summary', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+            <!-- Single Screen Area -->
+            <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
+                
+                <!-- Custom Gantt Chart (Top) -->
+                <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
+                    
+                    <!-- Backgrounds & Grids (Aligned to track width, skipping the w-10 icon column) -->
+                    <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
+                        <!-- Night Overlays (Deep blue 20% opacity) - Perfectly aligned 0-25% and 75-100% -->
+                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00-06 -->
+                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18-24 -->
+                        
+                        <!-- Vertical Dashed Lines -->
+                        <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 03:00 -->
+                        <div class="absolute top-0 bottom-0 left-[25%] border-l border-dashed border-gray-400 opacity-50 z-10"></div> <!-- 06:00 -->
+                        <div class="absolute top-0 bottom-0 left-[37.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 09:00 -->
+                        <div class="absolute top-0 bottom-0 left-[50%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 12:00 -->
+                        <div class="absolute top-0 bottom-0 left-[62.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 15:00 -->
+                        <div class="absolute top-0 bottom-0 left-[75%] border-l border-dashed border-gray-400 opacity-50 z-10"></div> <!-- 18:00 -->
+                        <div class="absolute top-0 bottom-0 left-[87.5%] border-l border-dashed border-gray-400 opacity-50"></div> <!-- 21:00 -->
+                    </div>
+
+                    <!-- Gantt Rows -->
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-milk"></div>
+                    </div>
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-droplet text-[#eab308] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-pee"></div>
+                    </div>
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-poop text-[#f97316] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-poo"></div>
+                    </div>
+                    <div class="flex-1 flex relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-moon text-[#9333ea] text-lg"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-sleep"></div>
+                    </div>
+
+                    <!-- X-Axis Labels (Aligned exactly with the dashed lines above) -->
+                    <div class="h-6 bg-white flex border-t border-gray-300 z-20 font-bold text-[10px] text-gray-600 relative flex-shrink-0">
+                        <div class="w-10 flex-shrink-0 border-r border-gray-200 bg-white"></div>
+                        <div class="flex-1 relative bg-white">
+                            <span class="absolute left-0 top-1 -translate-x-1/2">00</span>
+                            <span class="absolute left-[12.5%] top-1 -translate-x-1/2">03</span>
+                            <span class="absolute left-[25%] top-1 -translate-x-1/2">06</span>
+                            <span class="absolute left-[37.5%] top-1 -translate-x-1/2">09</span>
+                            <span class="absolute left-[50%] top-1 -translate-x-1/2">12</span>
+                            <span class="absolute left-[62.5%] top-1 -translate-x-1/2">15</span>
+                            <span class="absolute left-[75%] top-1 -translate-x-1/2">18</span>
+                            <span class="absolute left-[87.5%] top-1 -translate-x-1/2">21</span>
+                            <span class="absolute left-[100%] top-1 -translate-x-1/2">24</span>
+                        </div>
+                    </div>
+
+                    <div id="summary-no-data" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30 hidden">
+                        <i class="fas fa-box-open text-4xl text-gray-300 mb-2"></i>
+                        <span class="text-gray-400 font-bold" data-i18n="no_record">暫無紀錄</span>
+                    </div>
+                </div>
+
+                <!-- Stat Cards Grid (Bottom) - Using overflow-hidden and truncate for extreme cases -->
+                <div class="grid grid-cols-4 gap-2 h-[30%] flex-shrink-0 min-h-[120px]">
+                    <div class="bg-[var(--pastel-bg)] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
+                        <i class="fa-solid fa-bottle-water text-2xl sm:text-3xl text-[var(--pastel-primary)] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_milk">總奶量</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--pastel-primary-dark)] leading-none truncate w-full text-center" id="stat-milk">0</div>
+                    </div>
+                    <div class="bg-[#fef08a] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fde047] overflow-hidden min-w-0">
+                        <i class="fas fa-droplet text-2xl sm:text-3xl text-[#a16207] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_pee">小便</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#a16207] leading-none truncate w-full text-center" id="stat-pee">0</div>
+                    </div>
+                    <div class="bg-[#fed7aa] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fdba74] overflow-hidden min-w-0">
+                        <i class="fas fa-poop text-2xl sm:text-3xl text-[#9a3412] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_poo">大便</div>
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#9a3412] leading-none truncate w-full text-center" id="stat-poo">0</div>
+                    </div>
+                    <div class="bg-[#e9d5ff] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#d8b4fe] overflow-hidden min-w-0">
+                        <i class="fas fa-moon text-2xl sm:text-3xl text-[#581c87] mb-1"></i>
+                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_sleep">睡眠</div>
+                        <!-- NO time units, NO overflow, dynamic truncating text -->
+                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#581c87] leading-none truncate w-full text-center" id="stat-sleep">0</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation (Height and Fonts Huge) -->
+    <nav id="bottom-nav" class="pastel-nav w-full flex-shrink-0 flex h-[110px] pb-safe z-20 shadow-[0_-4px_10px_-2px_rgba(0,0,0,0.05)]">
+        <button onclick="switchTab('log')" id="nav-log" class="flex-1 flex flex-col items-center justify-center gap-2 active-tab transition-colors">
+            <i class="fas fa-pen-to-square text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_log">記錄活動</span>
+        </button>
+        <button onclick="switchTab('history')" id="nav-history" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
+            <i class="fas fa-clock-rotate-left text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_history">查看紀錄</span>
+        </button>
+        <button onclick="switchTab('summary')" id="nav-summary" class="flex-1 flex flex-col items-center justify-center gap-2 inactive-tab transition-colors">
+            <i class="fas fa-chart-pie text-4xl mb-1 mt-1"></i>
+            <span class="font-black text-lg" data-i18n="tab_summary">總結</span>
+        </button>
+    </nav>
+
+    <!-- Modal: Confirm / Edit (Massive Inputs) -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center modal-overlay p-4">
+        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] max-h-[95vh] overflow-y-auto no-scrollbar">
+            <h3 class="text-2xl font-black text-[var(--pastel-primary-dark)] text-center mb-4" id="modal-confirm-title">確認記錄</h3>
+            
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <div id="modal-confirm-icon" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner"></div>
+                <div id="modal-confirm-name" class="text-3xl font-black text-gray-800"></div>
+            </div>
+
+            <!-- Native Time Picker (h-20, text-4xl) -->
+            <div class="mb-4">
+                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="time_label">選擇時間</label>
+                <input type="time" id="modal-time" class="block w-full bg-white text-4xl font-black text-gray-800 p-2 h-20 rounded-2xl text-center border-4 border-[var(--pastel-primary-light)] focus:outline-none focu
