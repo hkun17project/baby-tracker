@@ -54,19 +54,12 @@
         .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         .active-tab { color: var(--pastel-primary); background-color: var(--pastel-bg); border-top: 6px solid var(--pastel-primary-light); }
         .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
+        
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
         .modal-content { animation: popUp 0.2s ease-out forwards; }
         
-        @keyframes toastSlide {
-            0% { transform: translate(-50%, 100%); opacity: 0; }
-            10% { transform: translate(-50%, -20px); opacity: 1; }
-            90% { transform: translate(-50%, -20px); opacity: 1; }
-            100% { transform: translate(-50%, 100%); opacity: 0; }
-        }
-        .toast-animate { animation: toastSlide 3s ease-in-out forwards; }
-        .flex-row-fill { flex: 1 1 0; min-height: 0; }
         input[type="time"]::-webkit-calendar-picker-indicator {
             background-color: var(--pastel-bg);
             padding: 10px;
@@ -77,19 +70,26 @@
 </head>
 <body class="flex flex-col h-[100dvh] overflow-hidden text-gray-800">
     <!-- Header -->
-    <header class="pastel-header py-3 px-4 shadow-sm z-10 flex-shrink-0 flex items-center justify-between relative">
+    <header class="pastel-header py-3 px-4 shadow-sm z-20 flex-shrink-0 flex items-center justify-between relative">
         <h1 class="text-2xl font-black tracking-wide flex-1 text-center"><i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span></h1>
-        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95">
+        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95 z-30">
             <span id="lang-toggle-text">中/EN</span>
         </button>
+        
+        <!-- Status Indicator (Cloud vs Local) -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 -bottom-3 bg-white border-2 border-[var(--pastel-primary-light)] px-3 py-0.5 rounded-full shadow-sm flex items-center gap-1.5 text-[10px] font-bold z-30">
+            <div id="status-dot" class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></div>
+            <span id="status-text" class="text-gray-600 whitespace-nowrap" data-i18n="status_connecting">連線中...</span>
+        </div>
     </header>
     
     <!-- Main Content Area -->
-    <main class="flex-1 overflow-hidden relative bg-gray-50">
+    <main class="flex-1 overflow-hidden relative bg-gray-50 pt-2">
         
         <!-- ================= TAB 1: LOG (記錄) ================= -->
         <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
-            <div class="grid grid-cols-2 gap-3 flex-row-fill">
+            <!-- 佔比加大 (flex-[1.2]) -->
+            <div class="grid grid-cols-2 gap-3 flex-[1.2] min-h-0">
                 <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
                     <i class="fas fa-droplet text-5xl"></i>
                     <span class="text-3xl font-black" data-i18n="pee">小便</span>
@@ -108,14 +108,14 @@
                 </button>
             </div>
             
-            <!-- Milk Intake Section -->
-            <div class="btn-milk-card rounded-[2rem] p-4 shadow-sm flex-row-fill flex flex-col justify-between">
-                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-3 active:scale-95 transition-transform w-full">
-                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-4 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
-                        <i class="fa-solid fa-bottle-water text-5xl"></i>
-                        <h2 class="text-4xl font-black" data-i18n="milk_record">飲奶記錄</h2>
+            <!-- Milk Intake Section (縮小20%，改為 flex-[0.8]) -->
+            <div class="btn-milk-card rounded-[2rem] p-3 shadow-sm flex-[0.8] flex flex-col justify-center min-h-0">
+                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-2 active:scale-95 transition-transform w-full">
+                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-3 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
+                        <i class="fa-solid fa-bottle-water text-4xl"></i>
+                        <h2 class="text-3xl font-black" data-i18n="milk_record">飲奶記錄</h2>
                     </div>
-                    <p class="text-gray-500 font-bold text-lg" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
+                    <p class="text-gray-500 font-bold text-base" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
                 </button>
             </div>
         </section>
@@ -156,12 +156,9 @@
                 <button onclick="changeDate('summary', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
             </div>
             
-            <!-- Single Screen Area -->
             <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
-                
-                <!-- Custom Gantt Chart (Top) -->
+                <!-- Custom Gantt Chart -->
                 <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
-                    <!-- Backgrounds & Grids -->
                     <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
                         <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
                         <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
@@ -174,7 +171,6 @@
                         <div class="absolute top-0 bottom-0 left-[87.5%] border-l border-dashed border-gray-400 opacity-50"></div>
                     </div>
                     
-                    <!-- Gantt Rows -->
                     <div class="flex-1 flex border-b border-gray-200 relative z-10">
                         <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-lg"></i></div>
                         <div class="flex-1 relative h-full w-full" id="track-milk"></div>
@@ -338,9 +334,9 @@
         </div>
     </div>
     
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-32 left-1/2 transform -translate-x-1/2 hidden z-[100] pointer-events-none">
-        <div class="bg-gray-800 text-white px-8 py-4 rounded-full shadow-lg flex items-center gap-3">
+    <!-- 改良版 Toast Notification (絕對不會被隱藏) -->
+    <div id="toast" class="fixed bottom-[130px] left-1/2 transform -translate-x-1/2 opacity-0 translate-y-10 transition-all duration-300 z-[100] pointer-events-none hidden w-max">
+        <div class="bg-gray-800 text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 border border-gray-600">
             <i class="fas fa-circle-check text-2xl text-green-400"></i>
             <span id="toast-message" class="text-xl font-bold whitespace-nowrap">記錄成功!</span>
         </div>
@@ -348,7 +344,6 @@
     
     <!-- App Scripts (Firebase & Local Fallback) -->
     <script type="module">
-        // 修正：鎖定為極度穩定的 10.12.0 版，避免 CDN 報錯
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -376,7 +371,7 @@
         let selectedLogId = null; 
         let currentLang = 'zh';
         let currentFilter = 'all'; 
-        let useLocalStorage = false; // 新增：本地降級開關
+        let useLocalStorage = false;
         
         let historyDate = new Date();
         let summaryDate = new Date(); 
@@ -393,7 +388,7 @@
                 filter_all: "全部", filter_milk: "飲奶", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠",
                 total_milk: "總奶量", total_pee: "小便", total_poo: "大便", total_sleep: "睡眠",
                 swipe_hint: "左右滑動切換日期", today: "今天", gap_prefix: "與上次相距 ", gap_duration: "長度: ", gap_hr: "小時", gap_min: "分",
-                to: "至", reset: "清零"
+                to: "至", reset: "清零", status_connecting: "連線中...", status_cloud: "已連線雲端", status_local: "本機儲存模式"
             },
             en: {
                 title: "Baby Tracker", langToggle: "EN/中", pee: "Wet", poo: "Dirty",
@@ -406,7 +401,7 @@
                 filter_all: "All", filter_milk: "Milk", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep",
                 total_milk: "Total Milk", total_pee: "Wet", total_poo: "Dirty", total_sleep: "Sleeps",
                 swipe_hint: "Swipe to change date", today: "Today", gap_prefix: "Since last: ", gap_duration: "Duration: ", gap_hr: "h ", gap_min: "m",
-                to: "to", reset: "Reset"
+                to: "to", reset: "Reset", status_connecting: "Connecting...", status_cloud: "Cloud Sync On", status_local: "Local Storage"
             }
         };
         
@@ -418,15 +413,30 @@
             'milk': { key: 'milk', icon: 'fa-bottle-water', colorClass: 'bg-[var(--pastel-bg)] text-[var(--pastel-primary)]', borderClass: 'border-[var(--pastel-primary-light)]' }
         };
         
-        // 初始化與容錯機制
+        function updateStatusUI(state) {
+            const dot = document.getElementById('status-dot');
+            const text = document.getElementById('status-text');
+            if (state === 'connecting') {
+                dot.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
+                text.innerText = i18n[currentLang].status_connecting;
+            } else if (state === 'cloud') {
+                dot.className = 'w-2 h-2 rounded-full bg-green-500';
+                text.innerText = i18n[currentLang].status_cloud;
+            } else if (state === 'local') {
+                dot.className = 'w-2 h-2 rounded-full bg-gray-400';
+                text.innerText = i18n[currentLang].status_local;
+            }
+        }
+
         async function initAuth() {
+            updateStatusUI('connecting');
             try {
                 await signInAnonymously(auth);
                 userId = auth.currentUser.uid;
                 subscribeToData();
             } catch (error) {
-                console.warn("Firebase Auth 失敗，自動切換至本地端:", error);
-                alert("連線雲端失敗(可能尚未啟用Firebase匿名登入)。已為你啟動「離線本地模式」，仍可完全正常使用！");
+                console.warn("Firebase Auth 失敗:", error);
+                alert("【雲端警告】連線失敗！請確保已在 Firebase Console 開啟「Anonymous(匿名登入)」。\n\n系統已自動為你切換至「本機儲存模式」，功能完全正常可繼續使用！");
                 enableLocalMode();
             }
         }
@@ -434,6 +444,7 @@
         function enableLocalMode() {
             useLocalStorage = true;
             userId = 'local_user';
+            updateStatusUI('local');
             const saved = localStorage.getItem('babyTrackerLogsLocal');
             if(saved) {
                 try { logsData = JSON.parse(saved); } catch(e){}
@@ -454,11 +465,12 @@
             
             onSnapshot(logsRef, (snapshot) => {
                 logsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                updateStatusUI('cloud');
                 if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
                 if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
             }, (error) => {
-                console.warn("Firebase 讀取失敗:", error);
-                alert("無法存取雲端資料庫(可能未設定Firestore測試權限)。系統已切換至「本地模式」。");
+                console.warn("Firebase Firestore 讀取失敗:", error);
+                alert("【雲端警告】無法存取資料庫！請確保 Firebase Firestore Rules 已設定為 true (測試模式)。\n\n系統已自動切換至「本機儲存模式」。");
                 enableLocalMode();
             });
         }
@@ -467,6 +479,9 @@
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('lang-toggle-text').innerText = currentLang === 'zh' ? '中/EN' : 'EN/中';
             updateTexts();
+            if (useLocalStorage) updateStatusUI('local');
+            else if (userId) updateStatusUI('cloud');
+            
             if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
             if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
             if(!document.getElementById('modal-confirm').classList.contains('hidden') && pendingAction){
@@ -532,7 +547,6 @@
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
         
-        // 儲存邏輯增強：支援雲端及本地雙模式
         window.confirmSaveLog = async function() {
             if (!pendingAction) return;
             const timeVal = document.getElementById('modal-time').value;
@@ -548,7 +562,6 @@
             
             const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substr(2, 5);
 
-            // 如果雲端失敗，使用本地降級儲存
             if (useLocalStorage || !userId) {
                 if(pendingAction.mode === 'edit') {
                     const idx = logsData.findIndex(l => l.id === pendingAction.id);
@@ -562,7 +575,6 @@
                 return;
             }
             
-            // 雲端儲存
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', docId);
                 await setDoc(docRef, logData, { merge: true });
@@ -570,7 +582,7 @@
                 showToast(i18n[currentLang].toast_save);
             } catch (error) { 
                 console.error("Firebase Save error:", error); 
-                alert("雲端存檔失敗！可能是 Firebase 權限問題。");
+                alert("雲端存檔失敗！可能是權限問題，系統將繼續運作但資料可能無法同步。");
             }
         };
         
@@ -885,10 +897,19 @@
         function showToast(msg) {
             const toast = document.getElementById('toast');
             document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('hidden', 'toast-animate');
-            void toast.offsetWidth; 
-            toast.classList.add('toast-animate');
-            setTimeout(() => { toast.classList.add('hidden'); }, 3000);
+            toast.classList.remove('hidden');
+            
+            // 強制重繪
+            void toast.offsetWidth;
+            
+            toast.classList.remove('opacity-0', 'translate-y-10');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => { 
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-10');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 2500);
         }
         
         window.addEventListener('DOMContentLoaded', () => {
