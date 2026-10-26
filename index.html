@@ -161,14 +161,10 @@
                 
                 <!-- Custom Gantt Chart (Top) -->
                 <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
-                    
                     <!-- Backgrounds & Grids -->
                     <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
-                        <!-- Night Overlays -->
-                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00-06 -->
-                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18-24 -->
-                        
-                        <!-- Vertical Dashed Lines -->
+                        <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
+                        <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div>
                         <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div>
                         <div class="absolute top-0 bottom-0 left-[25%] border-l border-dashed border-gray-400 opacity-50 z-10"></div>
                         <div class="absolute top-0 bottom-0 left-[37.5%] border-l border-dashed border-gray-400 opacity-50"></div>
@@ -335,7 +331,6 @@
     <div id="modal-single-detail" class="fixed inset-0 bg-black/50 z-[80] hidden flex items-center justify-center modal-overlay p-4">
         <div class="bg-white w-full max-w-xs rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] text-center relative">
             <button onclick="closeModal('modal-single-detail')" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-xl active:scale-95"><i class="fas fa-times"></i></button>
-            
             <div id="single-detail-icon" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-4"></div>
             <h3 id="single-detail-title" class="text-3xl font-black text-gray-800 mb-2"></h3>
             <p id="single-detail-time" class="text-2xl font-bold text-gray-500 mb-3"></p>
@@ -351,11 +346,12 @@
         </div>
     </div>
     
-    <!-- App Scripts (Firebase Cloud-Based) -->
+    <!-- App Scripts (Firebase & Local Fallback) -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        // 修正：鎖定為極度穩定的 10.12.0 版，避免 CDN 報錯
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         
         // =========================================================================
         // FIREBASE CONFIGURATION
@@ -369,11 +365,10 @@
             appId: "1:341594774394:web:e4c029e9de20dd8c8e54c3"
         };
         
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : manualFirebaseConfig;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'homecare-base';
-        const app = initializeApp(firebaseConfig);
+        const app = initializeApp(manualFirebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const appId = 'homecare-base';
         
         let userId = null;
         let logsData = [];
@@ -381,6 +376,7 @@
         let selectedLogId = null; 
         let currentLang = 'zh';
         let currentFilter = 'all'; 
+        let useLocalStorage = false; // 新增：本地降級開關
         
         let historyDate = new Date();
         let summaryDate = new Date(); 
@@ -422,22 +418,38 @@
             'milk': { key: 'milk', icon: 'fa-bottle-water', colorClass: 'bg-[var(--pastel-bg)] text-[var(--pastel-primary)]', borderClass: 'border-[var(--pastel-primary-light)]' }
         };
         
+        // 初始化與容錯機制
         async function initAuth() {
             try {
-                if (typeof __initial_auth_token !== 'undefined') {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                await signInAnonymously(auth);
                 userId = auth.currentUser.uid;
                 subscribeToData();
             } catch (error) {
-                console.error("Firebase Auth Error:", error);
+                console.warn("Firebase Auth 失敗，自動切換至本地端:", error);
+                alert("連線雲端失敗(可能尚未啟用Firebase匿名登入)。已為你啟動「離線本地模式」，仍可完全正常使用！");
+                enableLocalMode();
             }
         }
         
+        function enableLocalMode() {
+            useLocalStorage = true;
+            userId = 'local_user';
+            const saved = localStorage.getItem('babyTrackerLogsLocal');
+            if(saved) {
+                try { logsData = JSON.parse(saved); } catch(e){}
+            }
+            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+        }
+
+        function saveLocalData() {
+            localStorage.setItem('babyTrackerLogsLocal', JSON.stringify(logsData));
+            if(!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
+            if(!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
+        }
+
         function subscribeToData() {
-            if (!userId) return;
+            if (!userId || useLocalStorage) return;
             const logsRef = collection(db, 'artifacts', appId, 'users', userId, 'logs');
             
             onSnapshot(logsRef, (snapshot) => {
@@ -445,7 +457,9 @@
                 if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
                 if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
             }, (error) => {
-                console.error("Firebase Snapshot Error:", error);
+                console.warn("Firebase 讀取失敗:", error);
+                alert("無法存取雲端資料庫(可能未設定Firestore測試權限)。系統已切換至「本地模式」。");
+                enableLocalMode();
             });
         }
         
@@ -481,7 +495,6 @@
         };
         
         window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
-        
         window.changeModalAmount = function(delta) {
             const input = document.getElementById('modal-amount-input');
             let val = parseInt(input.value) || 0;
@@ -489,10 +502,7 @@
             if (val < 0) val = 0;
             input.value = val;
         };
-        
-        window.setModalAmount = function(val) {
-            document.getElementById('modal-amount-input').value = val;
-        };
+        window.setModalAmount = function(val) { document.getElementById('modal-amount-input').value = val; };
         
         window.openConfirmModal = function(type, amount = 0, mode = 'create', existingLog = null) {
             if (navigator.vibrate) navigator.vibrate(50);
@@ -522,8 +532,9 @@
             document.getElementById('modal-confirm').classList.remove('hidden');
         };
         
+        // 儲存邏輯增強：支援雲端及本地雙模式
         window.confirmSaveLog = async function() {
-            if (!pendingAction || !userId) return;
+            if (!pendingAction) return;
             const timeVal = document.getElementById('modal-time').value;
             if (!timeVal) return;
             
@@ -533,17 +544,34 @@
             
             let finalAmount = 0;
             if (pendingAction.type === 'milk') finalAmount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
-            
             const logData = { type: pendingAction.type, timestamp: baseTime.getTime(), amount: finalAmount };
             
+            const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substr(2, 5);
+
+            // 如果雲端失敗，使用本地降級儲存
+            if (useLocalStorage || !userId) {
+                if(pendingAction.mode === 'edit') {
+                    const idx = logsData.findIndex(l => l.id === pendingAction.id);
+                    if(idx > -1) logsData[idx] = { id: docId, ...logData };
+                } else {
+                    logsData.push({ id: docId, ...logData });
+                }
+                saveLocalData();
+                closeModal('modal-confirm');
+                showToast(i18n[currentLang].toast_save);
+                return;
+            }
+            
+            // 雲端儲存
             try {
-                const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substr(2, 5);
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', docId);
-                
                 await setDoc(docRef, logData, { merge: true });
                 closeModal('modal-confirm');
                 showToast(i18n[currentLang].toast_save);
-            } catch (error) { console.error("Firebase Save error:", error); }
+            } catch (error) { 
+                console.error("Firebase Save error:", error); 
+                alert("雲端存檔失敗！可能是 Firebase 權限問題。");
+            }
         };
         
         function getLogsForDay(dateObj) {
@@ -580,7 +608,6 @@
             let touchstartX = 0;
             let touchendX = 0;
             const area = document.getElementById(elementId);
-            
             area.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, {passive: true});
             area.addEventListener('touchend', e => {
                 touchendX = e.changedTouches[0].screenX;
@@ -675,7 +702,6 @@
                 document.getElementById('modal-action').classList.remove('hidden');
             }, 600);
         };
-        
         window.handleTouchEnd = function() { if (pressTimer) clearTimeout(pressTimer); };
         
         window.initiateEditLog = function() {
@@ -690,13 +716,25 @@
         };
         
         window.confirmDeleteLog = async function() {
-            if (!selectedLogId || !userId) return;
+            if (!selectedLogId) return;
+
+            if (useLocalStorage || !userId) {
+                logsData = logsData.filter(l => l.id !== selectedLogId);
+                saveLocalData();
+                closeModal('modal-delete');
+                showToast(i18n[currentLang].toast_del);
+                return;
+            }
+
             try {
                 const docRef = doc(db, 'artifacts', appId, 'users', userId, 'logs', selectedLogId);
                 await deleteDoc(docRef);
                 closeModal('modal-delete');
                 showToast(i18n[currentLang].toast_del);
-            } catch (error) { console.error("Firebase Delete error:", error); }
+            } catch (error) { 
+                console.error("Firebase Delete error:", error); 
+                alert("刪除失敗！");
+            }
         };
         
         function updateSummaryUI() {
@@ -705,7 +743,6 @@
             dayLogs.sort((a, b) => a.timestamp - b.timestamp);
             
             let totalMilk = 0, countPee = 0, countPoo = 0;
-            
             dayLogs.forEach(log => {
                 if (log.type === 'milk') totalMilk += log.amount;
                 else if (log.type === 'pee') countPee++;
@@ -748,7 +785,6 @@
             
             const hasData = dayLogs.length > 0;
             document.getElementById('summary-no-data').style.display = hasData ? 'none' : 'flex';
-            
             drawGanttChart(dayLogs);
         }
         
@@ -833,7 +869,6 @@
                     const dEnd = new Date(logEnd.timestamp);
                     const tEnd = `${dEnd.getHours().toString().padStart(2,'0')}:${dEnd.getMinutes().toString().padStart(2,'0')}`;
                     timeStr = `${tStart} ${i18n[currentLang].to} ${tEnd}`;
-                    
                     const diffMs = logEnd.timestamp - log.timestamp;
                     const h = Math.floor(diffMs / 3600000);
                     const m = Math.floor((diffMs % 3600000) / 60000);
@@ -844,7 +879,6 @@
             }
             document.getElementById('single-detail-time').innerText = timeStr;
             document.getElementById('single-detail-extra').innerText = extraStr;
-            
             document.getElementById('modal-single-detail').classList.remove('hidden');
         };
         
