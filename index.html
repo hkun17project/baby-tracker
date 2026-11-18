@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 Baby Tracker</title>
+    <title>👶 Baby Tracker v2.0</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -34,14 +34,18 @@
         .pastel-header { background-color: var(--pastel-primary-light); color: var(--pastel-primary-dark); }
         .pastel-nav { background-color: #ffffff; border-top: 2px solid var(--pastel-bg); }
         
-        .btn-action { transition: transform 0.1s; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        /* Tactile Big Buttons on Tab 1 */
+        .btn-action { transition: transform 0.1s; box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.08); }
         .btn-action:active { transform: scale(0.95); }
         
         .btn-pee { background-color: #fef08a; border: 4px solid #fde047; color: #a16207; }
         .btn-poo { background-color: #fed7aa; border: 4px solid #fdba74; color: #9a3412; }
         .btn-sleep-start { background-color: #e9d5ff; border: 4px solid #d8b4fe; color: #581c87; }
         .btn-sleep-end { background-color: #a5f3fc; border: 4px solid #67e8f9; color: #164e63; }
-        .btn-milk-card { background-color: #ffffff; border: 4px solid var(--pastel-primary-light); }
+        .btn-milk-water { background-color: #fce7f3; border: 4px solid #f9a8d4; color: #be185d; }
+        .btn-solid-food { background-color: #fde68a; border: 4px solid #fbbf24; color: #92400e; }
+        .btn-playtime { background-color: #d1fae5; border: 4px solid #6ee7b7; color: #065f46; }
+        .btn-walk { background-color: #ccfbf1; border: 4px solid #5eead4; color: #115e59; }
         
         .btn-milk-add { background-color: #ffffff; border: 2px solid var(--pastel-primary-light); color: var(--pastel-primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .btn-milk-add:active { background-color: var(--pastel-primary-light); transform: scale(0.95); }
@@ -49,6 +53,39 @@
         .btn-save { background-color: var(--pastel-primary); border: 4px solid var(--pastel-primary-dark); color: #ffffff; }
         .btn-save:active { background-color: var(--pastel-primary-dark); }
         
+        /* Interactive Option Chips inside Modals */
+        .opt-chip {
+            background-color: #f9fafb;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+            transition: all 0.12s ease;
+        }
+        .opt-chip:active { transform: scale(0.95); }
+        .opt-chip.selected-pink {
+            background-color: #fdf2f8;
+            color: #be185d;
+            border-color: #ec4899;
+            box-shadow: 0 2px 4px rgba(236, 72, 153, 0.15);
+        }
+        .opt-chip.selected-amber {
+            background-color: #fffbeb;
+            color: #92400e;
+            border-color: #f59e0b;
+            box-shadow: 0 2px 4px rgba(245, 158, 11, 0.15);
+        }
+        .opt-chip.selected-green {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-color: #10b981;
+            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.15);
+        }
+        .opt-chip.selected-sky {
+            background-color: #f0f9ff;
+            color: #0369a1;
+            border-color: #0ea5e9;
+            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.15);
+        }
+
         .filter-chip { background-color: #ffffff; color: #9ca3af; border: 2px solid #e5e7eb; }
         .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary); border-color: var(--pastel-primary-light); }
         .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
@@ -56,13 +93,13 @@
         .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes popUp { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-overlay { animation: fadeIn 0.2s ease-out forwards; }
-        .modal-content { animation: popUp 0.2s ease-out forwards; }
+        @keyframes popUp { from { transform: scale(0.92); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-overlay { animation: fadeIn 0.18s ease-out forwards; }
+        .modal-content { animation: popUp 0.18s ease-out forwards; }
         
         input[type="time"]::-webkit-calendar-picker-indicator {
             background-color: var(--pastel-bg);
-            padding: 10px;
+            padding: 8px;
             border-radius: 12px;
             cursor: pointer;
         }
@@ -74,7 +111,7 @@
         <h1 class="text-2xl font-black tracking-wide flex-1 text-center">
             <i class="fa-solid fa-baby-carriage mr-2"></i><span data-i18n="title">寶寶記錄</span>
         </h1>
-        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/80 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95 z-30">
+        <button onclick="toggleLanguage()" class="absolute right-4 bg-white/85 text-[var(--pastel-primary)] px-3 py-1 rounded-full font-bold text-sm border-2 border-white shadow-sm active:scale-95 z-30">
             <span id="lang-toggle-text">中/EN</span>
         </button>
         
@@ -88,81 +125,95 @@
     <!-- Main Content Area -->
     <main class="flex-1 overflow-hidden relative bg-gray-50 pt-2">
         
-        <!-- ================= TAB 1: LOG (記錄活動) ================= -->
-        <section id="tab-log" class="w-full h-full flex flex-col p-3 gap-3 bg-[var(--pastel-bg)]">
-            <!-- Top 2x2 Grid (flex-[1.2]) -->
-            <div class="grid grid-cols-2 gap-3 flex-[1.2] min-h-0">
-                <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-droplet text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="pee">小便</span>
+        <!-- ================= TAB 1: LOG (記錄活動 - 4x2 Full-Screen Grid) ================= -->
+        <section id="tab-log" class="w-full h-full flex flex-col p-3 bg-[var(--pastel-bg)]">
+            <div class="grid grid-cols-2 grid-rows-4 gap-2.5 flex-1 min-h-0">
+                <!-- Row 1: Excretion -->
+                <button onclick="openConfirmModal('pee')" class="btn-action btn-pee rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fas fa-droplet text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight" data-i18n="pee">小便</span>
                 </button>
-                <button onclick="openConfirmModal('poo')" class="btn-action btn-poo rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-poop text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="poo">大便</span>
+                <button onclick="openConfirmModal('poo')" class="btn-action btn-poo rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fas fa-poop text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight" data-i18n="poo">大便</span>
                 </button>
-                <button onclick="openConfirmModal('sleep_start')" class="btn-action btn-sleep-start rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-moon text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="sleep_start">開始睡</span>
+
+                <!-- Row 2: Sleep -->
+                <button onclick="openConfirmModal('sleep_start')" class="btn-action btn-sleep-start rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fas fa-moon text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight" data-i18n="sleep_start">開始睡</span>
                 </button>
-                <button onclick="openConfirmModal('sleep_end')" class="btn-action btn-sleep-end rounded-[2rem] flex flex-col items-center justify-center gap-2">
-                    <i class="fas fa-sun text-5xl"></i>
-                    <span class="text-3xl font-black" data-i18n="sleep_end">睡醒了</span>
+                <button onclick="openConfirmModal('sleep_end')" class="btn-action btn-sleep-end rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fas fa-sun text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight" data-i18n="sleep_end">睡醒了</span>
                 </button>
-            </div>
-            
-            <!-- Milk Intake Section (縮小 20%，設為 flex-[0.8]) -->
-            <div class="btn-milk-card rounded-[2rem] p-3 shadow-sm flex-[0.8] flex flex-col justify-center min-h-0">
-                <button onclick="openConfirmModal('milk', 0)" class="flex flex-col items-center justify-center h-full gap-2 active:scale-95 transition-transform w-full">
-                    <div class="flex items-center justify-center gap-3 text-[var(--pastel-primary)] bg-[var(--pastel-bg)] w-full py-3 rounded-3xl border-4 border-[var(--pastel-primary-light)]">
-                        <i class="fa-solid fa-bottle-water text-4xl"></i>
-                        <h2 class="text-3xl font-black" data-i18n="milk_record">飲奶記錄</h2>
-                    </div>
-                    <p class="text-gray-500 font-bold text-base" data-i18n="click_to_add_milk">點擊此處記錄奶量</p>
+
+                <!-- Row 3: Feeding (Milk/Water & Solid Food) -->
+                <button onclick="openConfirmModal('milk')" class="btn-action btn-milk-water rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fa-solid fa-bottle-water text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight text-center" data-i18n="milk_water_btn">飲奶 / 飲水</span>
+                </button>
+                <button onclick="openConfirmModal('solid_food')" class="btn-action btn-solid-food rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fa-solid fa-bowl-food text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight text-center" data-i18n="solid_food">加固食品</span>
+                </button>
+
+                <!-- Row 4: Daily Activities (Playtime & Walk) -->
+                <button onclick="openConfirmModal('playtime')" class="btn-action btn-playtime rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fa-solid fa-shapes text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight text-center" data-i18n="playtime">Playtime</span>
+                </button>
+                <button onclick="openConfirmModal('walk')" class="btn-action btn-walk rounded-[1.75rem] flex flex-col items-center justify-center gap-1 px-2">
+                    <i class="fa-solid fa-tree text-4xl sm:text-5xl"></i>
+                    <span class="text-2xl sm:text-3xl font-black leading-tight text-center" data-i18n="walk">散步外出</span>
                 </button>
             </div>
         </section>
         
         <!-- ================= TAB 2: HISTORY (查看紀錄) ================= -->
         <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
-            <div class="flex items-center justify-between px-4 py-3 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
-                <button onclick="changeDate('history', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+            <div class="flex items-center justify-between px-4 py-2.5 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
+                <button onclick="changeDate('history', -1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
                 <div class="flex flex-col items-center">
                     <span id="history-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
                     <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
                 </div>
-                <button onclick="changeDate('history', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+                <button onclick="changeDate('history', 1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
             </div>
             
-            <div class="px-3 py-3 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_all">全部</button>
-                <button onclick="setFilter('milk')" id="filter-milk" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_milk">飲奶</button>
-                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_pee">小便</button>
-                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_poo">大便</button>
-                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-5 py-2 rounded-full font-bold text-lg transition-colors" data-i18n="filter_sleep">睡眠</button>
+            <!-- Filter Bar -->
+            <div class="px-3 py-2.5 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_all">全部</button>
+                <button onclick="setFilter('milk_water')" id="filter-milk_water" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_milk_water">飲奶/水</button>
+                <button onclick="setFilter('solid_food')" id="filter-solid_food" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_solid">加固</button>
+                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_pee">小便</button>
+                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_poo">大便</button>
+                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_sleep">睡眠</button>
+                <button onclick="setFilter('activity')" id="filter-activity" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_activity">活動</button>
             </div>
             
             <div id="history-swipe-area" class="flex-1 overflow-y-auto no-scrollbar p-3 relative bg-gray-50">
-                <div class="text-sm text-gray-400 mb-3 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
-                <div id="history-list" class="space-y-3 pb-6"></div>
+                <div class="text-sm text-gray-400 mb-2.5 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
+                <div id="history-list" class="space-y-2.5 pb-6"></div>
             </div>
         </section>
         
-        <!-- ================= TAB 3: SUMMARY (總結) ================= -->
+        <!-- ================= TAB 3: SUMMARY (總結 - 100dvh Single Screen) ================= -->
         <section id="tab-summary" class="w-full h-full flex flex-col hidden bg-white">
             <div class="flex items-center justify-between px-4 py-2 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
-                <button onclick="changeDate('summary', -1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
+                <button onclick="changeDate('summary', -1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
                 <div class="flex flex-col items-center">
                     <span id="summary-date-display" class="text-2xl font-black text-[var(--pastel-primary-dark)]">今天</span>
                     <span class="text-xs font-bold text-gray-500" data-i18n="swipe_hint">左右滑動切換日期</span>
                 </div>
-                <button onclick="changeDate('summary', 1)" class="w-12 h-12 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
+                <button onclick="changeDate('summary', 1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
             </div>
             
-            <div id="summary-swipe-area" class="flex-1 p-3 flex flex-col gap-3 min-h-0 bg-white">
-                <!-- Custom 24-Hour Gantt Chart (Top) -->
-                <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[160px]">
-                    <!-- Night Overlays & 3-Hour Vertical Grid Lines (Aligned to track area skipping w-10 icon column) -->
-                    <div class="absolute top-0 bottom-6 left-10 right-0 pointer-events-none z-0">
+            <div id="summary-swipe-area" class="flex-1 p-2.5 flex flex-col gap-2.5 min-h-0 bg-white">
+                <!-- Custom 5-Track 24-Hour Gantt Chart (Top) -->
+                <div class="flex-1 bg-gray-50 rounded-[1.5rem] shadow-sm border-2 border-gray-200 flex flex-col relative overflow-hidden min-h-[150px]">
+                    <!-- Night Overlays & 3-Hour Vertical Grid Lines -->
+                    <div class="absolute top-0 bottom-5 left-10 right-0 pointer-events-none z-0">
                         <div class="absolute top-0 bottom-0 left-0 w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 00:00 - 06:00 -->
                         <div class="absolute top-0 bottom-0 left-[75%] w-[25%] bg-[rgba(0,0,139,0.2)]"></div> <!-- 18:00 - 23:59 -->
                         <div class="absolute top-0 bottom-0 left-[12.5%] border-l border-dashed border-gray-400 opacity-50"></div>
@@ -174,65 +225,108 @@
                         <div class="absolute top-0 bottom-0 left-[87.5%] border-l border-dashed border-gray-400 opacity-50"></div>
                     </div>
                     
+                    <!-- Track 1: Milk & Water -->
                     <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-milk"></div>
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bottle-water text-[var(--pastel-primary)] text-base"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-milk-water"></div>
                     </div>
+                    <!-- Track 2: Solid Food -->
                     <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-droplet text-[#eab308] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-pee"></div>
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-bowl-food text-[#d97706] text-base"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-solid"></div>
                     </div>
+                    <!-- Track 3: Excretion (Pee & Poo) -->
                     <div class="flex-1 flex border-b border-gray-200 relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-poop text-[#f97316] text-lg"></i></div>
-                        <div class="flex-1 relative h-full w-full" id="track-poo"></div>
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-droplet text-[#eab308] text-base"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-excretion"></div>
                     </div>
+                    <!-- Track 4: Activities (Playtime & Walk) -->
+                    <div class="flex-1 flex border-b border-gray-200 relative z-10">
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fa-solid fa-shapes text-[#10b981] text-base"></i></div>
+                        <div class="flex-1 relative h-full w-full" id="track-activity"></div>
+                    </div>
+                    <!-- Track 5: Sleep -->
                     <div class="flex-1 flex relative z-10">
-                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-moon text-[#9333ea] text-lg"></i></div>
+                        <div class="w-10 flex items-center justify-center bg-white border-r border-gray-200 z-20 flex-shrink-0"><i class="fas fa-moon text-[#9333ea] text-base"></i></div>
                         <div class="flex-1 relative h-full w-full" id="track-sleep"></div>
                     </div>
                     
                     <!-- X-Axis Labels -->
-                    <div class="h-6 bg-white flex border-t border-gray-300 z-20 font-bold text-[10px] text-gray-600 relative flex-shrink-0">
+                    <div class="h-5 bg-white flex border-t border-gray-300 z-20 font-bold text-[10px] text-gray-600 relative flex-shrink-0">
                         <div class="w-10 flex-shrink-0 border-r border-gray-200 bg-white"></div>
                         <div class="flex-1 relative bg-white">
-                            <span class="absolute left-0 top-1 -translate-x-1/2">00</span>
-                            <span class="absolute left-[12.5%] top-1 -translate-x-1/2">03</span>
-                            <span class="absolute left-[25%] top-1 -translate-x-1/2">06</span>
-                            <span class="absolute left-[37.5%] top-1 -translate-x-1/2">09</span>
-                            <span class="absolute left-[50%] top-1 -translate-x-1/2">12</span>
-                            <span class="absolute left-[62.5%] top-1 -translate-x-1/2">15</span>
-                            <span class="absolute left-[75%] top-1 -translate-x-1/2">18</span>
-                            <span class="absolute left-[87.5%] top-1 -translate-x-1/2">21</span>
-                            <span class="absolute left-[100%] top-1 -translate-x-1/2">24</span>
+                            <span class="absolute left-0 top-0.5 -translate-x-1/2">00</span>
+                            <span class="absolute left-[12.5%] top-0.5 -translate-x-1/2">03</span>
+                            <span class="absolute left-[25%] top-0.5 -translate-x-1/2">06</span>
+                            <span class="absolute left-[37.5%] top-0.5 -translate-x-1/2">09</span>
+                            <span class="absolute left-[50%] top-0.5 -translate-x-1/2">12</span>
+                            <span class="absolute left-[62.5%] top-0.5 -translate-x-1/2">15</span>
+                            <span class="absolute left-[75%] top-0.5 -translate-x-1/2">18</span>
+                            <span class="absolute left-[87.5%] top-0.5 -translate-x-1/2">21</span>
+                            <span class="absolute left-[100%] top-0.5 -translate-x-1/2">24</span>
                         </div>
                     </div>
+
                     <div id="summary-no-data" class="absolute inset-0 flex flex-col items-center justify-center bg-white/90 z-30 hidden">
                         <i class="fas fa-box-open text-4xl text-gray-300 mb-2"></i>
                         <span class="text-gray-400 font-bold" data-i18n="no_record">暫無紀錄</span>
                     </div>
                 </div>
                 
-                <!-- Stat Cards Grid (Bottom) -->
-                <div class="grid grid-cols-4 gap-2 h-[30%] flex-shrink-0 min-h-[120px]">
-                    <div class="bg-[var(--pastel-bg)] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
-                        <i class="fa-solid fa-bottle-water text-2xl sm:text-3xl text-[var(--pastel-primary)] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_milk">總奶量</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[var(--pastel-primary-dark)] leading-none truncate w-full text-center" id="stat-milk">0</div>
+                <!-- 6-Card (3 cols x 2 rows) Compact Stat Grid (Bottom) -->
+                <div class="grid grid-cols-3 grid-rows-2 gap-2 h-[38%] flex-shrink-0 min-h-[145px]">
+                    <!-- 1: Total Milk (ml) -->
+                    <div class="bg-[var(--pastel-bg)] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[var(--pastel-primary-light)] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fa-solid fa-bottle-water text-base sm:text-lg text-[var(--pastel-primary)] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_milk">總奶量</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[var(--pastel-primary-dark)] leading-none truncate w-full text-center" id="stat-milk">0</div>
                     </div>
-                    <div class="bg-[#fef08a] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fde047] overflow-hidden min-w-0">
-                        <i class="fas fa-droplet text-2xl sm:text-3xl text-[#a16207] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_pee">小便</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#a16207] leading-none truncate w-full text-center" id="stat-pee">0</div>
+
+                    <!-- 2: Solid Food Count -->
+                    <div class="bg-[#fef3c7] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[#fcd34d] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fa-solid fa-bowl-food text-base sm:text-lg text-[#d97706] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_solid">加固</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#92400e] leading-none truncate w-full text-center" id="stat-solid">0</div>
                     </div>
-                    <div class="bg-[#fed7aa] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#fdba74] overflow-hidden min-w-0">
-                        <i class="fas fa-poop text-2xl sm:text-3xl text-[#9a3412] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_poo">大便</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#9a3412] leading-none truncate w-full text-center" id="stat-poo">0</div>
+
+                    <!-- 3: Pee Count -->
+                    <div class="bg-[#fef08a] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[#fde047] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fas fa-droplet text-base sm:text-lg text-[#a16207] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_pee">小便</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#a16207] leading-none truncate w-full text-center" id="stat-pee">0</div>
                     </div>
-                    <div class="bg-[#e9d5ff] rounded-[1.2rem] p-2 flex flex-col items-center justify-center border-4 border-[#d8b4fe] overflow-hidden min-w-0">
-                        <i class="fas fa-moon text-2xl sm:text-3xl text-[#581c87] mb-1"></i>
-                        <div class="text-xs sm:text-sm font-black text-gray-600 text-center leading-tight mb-1 truncate w-full" data-i18n="total_sleep">睡眠</div>
-                        <div class="text-3xl sm:text-4xl lg:text-5xl font-black text-[#581c87] leading-none truncate w-full text-center" id="stat-sleep">0</div>
+
+                    <!-- 4: Poo Count -->
+                    <div class="bg-[#fed7aa] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[#fdba74] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fas fa-poop text-base sm:text-lg text-[#9a3412] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_poo">大便</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#9a3412] leading-none truncate w-full text-center" id="stat-poo">0</div>
+                    </div>
+
+                    <!-- 5: Activity Hours (1 decimal place) -->
+                    <div class="bg-[#d1fae5] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[#6ee7b7] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fa-solid fa-shapes text-base sm:text-lg text-[#059669] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_activity">活動</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#065f46] leading-none truncate w-full text-center" id="stat-activity">0.0</div>
+                    </div>
+
+                    <!-- 6: Sleep Hours (STRICTLY .toFixed(1), NO unit, NO overflow) -->
+                    <div class="bg-[#e9d5ff] rounded-[1.1rem] px-2 py-1.5 flex flex-col items-center justify-center border-[3px] border-[#d8b4fe] overflow-hidden min-w-0">
+                        <div class="flex items-center gap-1 text-gray-600 mb-0.5 w-full justify-center">
+                            <i class="fas fa-moon text-base sm:text-lg text-[#581c87] flex-shrink-0"></i>
+                            <span class="text-xs sm:text-sm font-black truncate" data-i18n="total_sleep">睡眠</span>
+                        </div>
+                        <div class="text-2xl sm:text-3xl lg:text-4xl font-black text-[#581c87] leading-none truncate w-full text-center" id="stat-sleep">0.0</div>
                     </div>
                 </div>
             </div>
@@ -255,38 +349,126 @@
         </button>
     </nav>
     
-    <!-- Modal: Confirm / Edit -->
-    <div id="modal-confirm" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center modal-overlay p-4">
-        <div class="bg-white w-full max-w-sm rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] max-h-[95vh] overflow-y-auto no-scrollbar">
-            <h3 class="text-2xl font-black text-[var(--pastel-primary-dark)] text-center mb-4" id="modal-confirm-title">確認記錄</h3>
+    <!-- ================= MODAL: CONFIRM / EDIT ================= -->
+    <div id="modal-confirm" class="fixed inset-0 bg-black/60 z-[60] hidden flex items-center justify-center modal-overlay p-3">
+        <div class="bg-white w-full max-w-md rounded-[2rem] p-5 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] max-h-[94dvh] overflow-y-auto no-scrollbar">
+            <h3 class="text-2xl font-black text-[var(--pastel-primary-dark)] text-center mb-3" id="modal-confirm-title">確認記錄</h3>
             
-            <div class="flex items-center justify-center gap-4 mb-6">
-                <div id="modal-confirm-icon" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-inner"></div>
-                <div id="modal-confirm-name" class="text-3xl font-black text-gray-800"></div>
+            <!-- Icon & Activity Header -->
+            <div class="flex items-center justify-center gap-3 mb-4">
+                <div id="modal-confirm-icon" class="w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner flex-shrink-0"></div>
+                <div id="modal-confirm-name" class="text-2xl sm:text-3xl font-black text-gray-800"></div>
             </div>
             
+            <!-- Native Time Picker (Always h-20 text-4xl) -->
             <div class="mb-4">
-                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="time_label">選擇時間</label>
+                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-1.5 text-lg text-center" data-i18n="time_label">選擇時間</label>
                 <input type="time" id="modal-time" class="block w-full bg-white text-4xl font-black text-gray-800 p-2 h-20 rounded-2xl text-center border-4 border-[var(--pastel-primary-light)] focus:outline-none focus:border-[var(--pastel-primary)] shadow-inner">
             </div>
-            
-            <div id="modal-amount-container" class="mb-6 hidden">
-                <label class="block text-[var(--pastel-primary-dark)] font-bold mb-2 text-xl text-center" data-i18n="amount_label">奶量 (ml)</label>
-                <input type="number" id="modal-amount-input" class="block w-full bg-white text-4xl font-black text-center text-gray-800 p-2 h-20 rounded-2xl border-4 border-[var(--pastel-primary-light)] focus:outline-none focus:border-[var(--pastel-primary)] shadow-inner" value="0" min="0">
-                
-                <div class="flex justify-between gap-2 mt-4">
-                    <button onclick="changeModalAmount(10)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+10</button>
-                    <button onclick="changeModalAmount(50)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+50</button>
-                    <button onclick="changeModalAmount(100)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-xl sm:text-2xl">+100</button>
-                    <button onclick="setModalAmount(0)" class="btn-milk-add flex-1 py-4 rounded-xl font-black text-lg sm:text-xl !bg-gray-200 !text-gray-700 !border-gray-300 whitespace-nowrap" data-i18n="reset">清零</button>
+
+            <!-- 1. MILK / WATER SECTION (Plan A Segmented Toggle) -->
+            <div id="modal-milk-water-container" class="mb-4 hidden">
+                <!-- Segmented Toggle -->
+                <div class="grid grid-cols-2 gap-2 p-1.5 bg-gray-100 rounded-2xl mb-4 border-2 border-gray-200">
+                    <button type="button" id="toggle-mode-milk" onclick="setDrinkMode('milk')" class="py-3 rounded-xl font-black text-xl transition-all bg-[var(--pastel-primary)] text-white shadow">
+                        🍼 <span data-i18n="milk">飲奶</span>
+                    </button>
+                    <button type="button" id="toggle-mode-water" onclick="setDrinkMode('water')" class="py-3 rounded-xl font-black text-xl transition-all text-gray-600">
+                        💧 <span data-i18n="water">飲清水</span>
+                    </button>
+                </div>
+
+                <!-- Sub-panel A: Milk -->
+                <div id="subpanel-milk">
+                    <label class="block text-[var(--pastel-primary-dark)] font-bold mb-1.5 text-lg text-center" data-i18n="amount_label">奶量 (ml)</label>
+                    <input type="number" id="modal-amount-input" class="block w-full bg-white text-4xl font-black text-center text-gray-800 p-2 h-20 rounded-2xl border-4 border-[var(--pastel-primary-light)] focus:outline-none focus:border-[var(--pastel-primary)] shadow-inner" value="0" min="0">
+                    <div class="flex justify-between gap-2 mt-3">
+                        <button type="button" onclick="changeModalAmount(10)" class="btn-milk-add flex-1 py-3.5 rounded-xl font-black text-xl">+10</button>
+                        <button type="button" onclick="changeModalAmount(50)" class="btn-milk-add flex-1 py-3.5 rounded-xl font-black text-xl">+50</button>
+                        <button type="button" onclick="changeModalAmount(100)" class="btn-milk-add flex-1 py-3.5 rounded-xl font-black text-xl">+100</button>
+                        <button type="button" onclick="setModalAmount(0)" class="btn-milk-add flex-1 py-3.5 rounded-xl font-black text-lg !bg-gray-200 !text-gray-700 !border-gray-300 whitespace-nowrap" data-i18n="reset">清零</button>
+                    </div>
+                </div>
+
+                <!-- Sub-panel B: Plain Water Quick Chips -->
+                <div id="subpanel-water" class="hidden">
+                    <label class="block text-sky-700 font-bold mb-2 text-lg text-center" data-i18n="water_amount_label">飲水量</label>
+                    <div class="grid grid-cols-2 gap-2.5" id="water-chips-container"></div>
+                </div>
+            </div>
+
+            <!-- 2. SOLID FOOD SECTION (Plan A) -->
+            <div id="modal-solid-container" class="mb-4 hidden space-y-4">
+                <!-- Base (Multi-select) -->
+                <div>
+                    <label class="block text-amber-800 font-black mb-1.5 text-base" data-i18n="solid_base_label">1. 調配基底 (可複選)</label>
+                    <div class="flex flex-wrap gap-2" id="solid-base-chips"></div>
+                </div>
+
+                <!-- Foods (Multi-select + Add Custom Food) -->
+                <div>
+                    <label class="block text-amber-800 font-black mb-1.5 text-base" data-i18n="solid_food_label">2. 食材種類 (可複選)</label>
+                    <div class="flex flex-wrap gap-2" id="solid-food-chips"></div>
+                    
+                    <!-- Inline Add New Food Input -->
+                    <div id="add-food-box" class="hidden mt-2.5 flex gap-2">
+                        <input type="text" id="new-food-input" placeholder="輸入新食材 (如: 三文魚)" class="flex-1 px-3 py-2.5 rounded-xl border-2 border-amber-400 font-bold text-base focus:outline-none">
+                        <button type="button" onclick="saveNewCustomFood()" class="bg-amber-500 text-white px-4 py-2.5 rounded-xl font-black text-base active:scale-95" data-i18n="add_btn">加入</button>
+                    </div>
+                </div>
+
+                <!-- Portion (Single-select) -->
+                <div>
+                    <label class="block text-amber-800 font-black mb-1.5 text-base" data-i18n="solid_portion_label">3. 準備份量</label>
+                    <div class="flex flex-wrap gap-2" id="solid-portion-chips"></div>
+                </div>
+
+                <!-- Intake / Reaction (Single-select) -->
+                <div>
+                    <label class="block text-amber-800 font-black mb-1.5 text-base" data-i18n="solid_intake_label">4. 實際表現</label>
+                    <div class="flex flex-wrap gap-2" id="solid-intake-chips"></div>
+                </div>
+
+                <!-- Post-Meal Water Toggle -->
+                <div class="pt-1">
+                    <button type="button" id="btn-post-meal-water" onclick="togglePostMealWater()" class="w-full py-3.5 px-4 rounded-2xl font-black text-lg border-2 flex items-center justify-center gap-2 transition-all opt-chip">
+                        <span>💧</span>
+                        <span data-i18n="post_meal_water">餐後飲水 (幾啖)</span>
+                        <i id="post-meal-water-check" class="fas fa-circle-check hidden ml-1 text-sky-600"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. PLAYTIME SECTION -->
+            <div id="modal-playtime-container" class="mb-4 hidden space-y-4">
+                <div>
+                    <label class="block text-emerald-800 font-black mb-1.5 text-base" data-i18n="playtime_type_label">1. Playtime 種類 (可複選)</label>
+                    <div class="flex flex-wrap gap-2" id="playtime-type-chips"></div>
+                </div>
+                <div>
+                    <label class="block text-emerald-800 font-black mb-1.5 text-base" data-i18n="duration_label">2. 持續時間</label>
+                    <div class="grid grid-cols-3 gap-2" id="playtime-duration-chips"></div>
+                </div>
+            </div>
+
+            <!-- 4. WALK SECTION -->
+            <div id="modal-walk-container" class="mb-4 hidden space-y-4">
+                <div>
+                    <label class="block text-teal-800 font-black mb-1.5 text-base" data-i18n="duration_label">1. 持續時間</label>
+                    <div class="grid grid-cols-3 gap-2" id="walk-duration-chips"></div>
+                </div>
+                <div>
+                    <label class="block text-teal-800 font-black mb-1.5 text-base" data-i18n="walk_place_label">2. 地點 / 類型 (選填)</label>
+                    <div class="flex flex-wrap gap-2" id="walk-place-chips"></div>
                 </div>
             </div>
             
-            <div class="flex gap-3 mt-4 pt-2">
-                <button onclick="closeModal('modal-confirm')" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl text-2xl font-bold active:bg-gray-300">
+            <!-- Modal Action Buttons -->
+            <div class="flex gap-3 mt-3 pt-2">
+                <button type="button" onclick="closeModal('modal-confirm')" class="flex-1 bg-gray-200 text-gray-700 py-4 rounded-xl text-2xl font-bold active:bg-gray-300">
                     <span data-i18n="cancel">取消</span>
                 </button>
-                <button onclick="confirmSaveLog()" class="flex-1 btn-save py-4 rounded-xl text-2xl font-black shadow-md">
+                <button type="button" onclick="confirmSaveLog()" class="flex-1 btn-save py-4 rounded-xl text-2xl font-black shadow-md">
                     <i class="fas fa-check"></i> <span data-i18n="confirm">確認</span>
                 </button>
             </div>
@@ -331,9 +513,9 @@
         <div class="bg-white w-full max-w-xs rounded-[2rem] p-6 shadow-2xl modal-content flex flex-col border-4 border-[var(--pastel-primary-light)] text-center relative">
             <button onclick="closeModal('modal-single-detail')" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center font-bold text-xl active:scale-95"><i class="fas fa-times"></i></button>
             <div id="single-detail-icon" class="w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-4"></div>
-            <h3 id="single-detail-title" class="text-3xl font-black text-gray-800 mb-2"></h3>
-            <p id="single-detail-time" class="text-2xl font-bold text-gray-500 mb-3"></p>
-            <p id="single-detail-extra" class="text-4xl font-black text-[var(--pastel-primary)] mb-1"></p>
+            <h3 id="single-detail-title" class="text-2xl font-black text-gray-800 mb-1.5"></h3>
+            <p id="single-detail-time" class="text-xl font-bold text-gray-500 mb-3"></p>
+            <div id="single-detail-extra" class="text-lg font-black text-[var(--pastel-primary-dark)] bg-[var(--pastel-bg)] rounded-2xl p-3 empty:hidden"></div>
         </div>
     </div>
 
@@ -345,7 +527,7 @@
                 <i class="fas fa-cloud"></i>
             </div>
             <h3 id="status-modal-title" class="text-2xl font-black text-gray-800 mb-2">儲存狀態資訊</h3>
-            <p id="status-modal-desc" class="text-base font-bold text-gray-600 mb-4 leading-relaxed"></p>
+            <p id="status-modal-desc" class="text-base font-bold text-gray-600 mb-4 leading-relaxed whitespace-pre-line"></p>
             <button onclick="closeModal('modal-status-info')" class="w-full btn-save py-3 rounded-xl text-xl font-black shadow-md" data-i18n="confirm">確認</button>
         </div>
     </div>
@@ -365,7 +547,7 @@
         import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
         
         // =========================================================================
-        // FIREBASE CONFIGURATION (Web Client SDK)
+        // FIREBASE CONFIGURATION
         // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDyHrDgTBJXFTDaZ17rqJyjkSp-cvb86_Y",
@@ -382,6 +564,7 @@
         const COLLECTION_NAME = 'baby_logs';
         
         let logsData = [];
+        let customFoods = [];
         let pendingAction = null; 
         let selectedLogId = null; 
         let currentLang = 'zh';
@@ -391,33 +574,158 @@
         
         let historyDate = new Date();
         let summaryDate = new Date(); 
+
+        // Modal working state
+        let modalState = {
+            drinkMode: 'milk', // 'milk' | 'water'
+            waterAmount: '幾啖',
+            solidBases: [],
+            solidFoods: [],
+            solidPortion: '1 粒冰磚',
+            solidIntake: '食大半',
+            postMealWater: false,
+            playtimeTypes: ['地墊時光'],
+            playtimeDuration: 15,
+            walkDuration: 30,
+            walkPlaces: []
+        };
+
+        // Option Dictionaries (Bilingual label mapping)
+        const OPTIONS = {
+            waterAmounts: [
+                { zh: '幾啖', en: 'A few sips' },
+                { zh: '10 ml', en: '10 ml' },
+                { zh: '20 ml', en: '20 ml' },
+                { zh: '30 ml', en: '30 ml' }
+            ],
+            solidBases: [
+                { zh: '開水調配', en: 'Water Base' },
+                { zh: '奶粉基底', en: 'Formula Base' },
+                { zh: '米糊', en: 'Rice Cereal' },
+                { zh: '粥仔', en: 'Congee' },
+                { zh: '純果菜蓉', en: 'Puree Only' }
+            ],
+            presetFoods: [
+                { zh: '蘋果蓉', en: 'Apple' },
+                { zh: '南瓜蓉', en: 'Pumpkin' },
+                { zh: '番薯蓉', en: 'Sweet Potato' },
+                { zh: '香蕉蓉', en: 'Banana' },
+                { zh: '紅蘿蔔蓉', en: 'Carrot' },
+                { zh: '西蘭花蓉', en: 'Broccoli' },
+                { zh: '牛油果', en: 'Avocado' }
+            ],
+            solidPortions: [
+                { zh: '1 粒冰磚', en: '1 Cube' },
+                { zh: '2 粒冰磚', en: '2 Cubes' },
+                { zh: '3 粒冰磚', en: '3 Cubes' },
+                { zh: '1-2 湯匙', en: '1-2 Tbsp' },
+                { zh: '半碗', en: 'Half Bowl' }
+            ],
+            solidIntakes: [
+                { zh: '試味 (幾啖)', en: 'Tasted (Sips)' },
+                { zh: '食少少 (1/3)', en: 'Ate Little (1/3)' },
+                { zh: '食大半', en: 'Ate Most' },
+                { zh: '食晒 🎉', en: 'Finished All 🎉' },
+                { zh: '抗拒/吐出', en: 'Refused/Spat' }
+            ],
+            playtimeTypes: [
+                { zh: '地墊時光', en: 'Playmat' },
+                { zh: '趴玩 (Tummy Time)', en: 'Tummy Time' },
+                { zh: '坐玩', en: 'Sitting Play' },
+                { zh: '站立玩', en: 'Standing Play' },
+                { zh: '閱讀繪本', en: 'Reading Books' },
+                { zh: '感官遊戲', en: 'Sensory Play' }
+            ],
+            playtimeDurations: [
+                { mins: 10, zh: '10分鐘', en: '10 mins' },
+                { mins: 15, zh: '15分鐘', en: '15 mins' },
+                { mins: 20, zh: '20分鐘', en: '20 mins' },
+                { mins: 30, zh: '30分鐘', en: '30 mins' },
+                { mins: 45, zh: '45分鐘', en: '45 mins' },
+                { mins: 60, zh: '1小時', en: '1 hr' }
+            ],
+            walkDurations: [
+                { mins: 15, zh: '15分鐘', en: '15 mins' },
+                { mins: 20, zh: '20分鐘', en: '20 mins' },
+                { mins: 30, zh: '30分鐘', en: '30 mins' },
+                { mins: 45, zh: '45分鐘', en: '45 mins' },
+                { mins: 60, zh: '1小時', en: '1 hr' },
+                { mins: 90, zh: '1.5小時', en: '1.5 hrs' }
+            ],
+            walkPlaces: [
+                { zh: '公園散步', en: 'Park Walk' },
+                { zh: '商場逛街', en: 'Mall Stroll' },
+                { zh: '曬太陽', en: 'Sunbath' }
+            ]
+        };
+
+        // Helper to translate stored Chinese canonical strings into current UI language
+        function trOpt(zhVal) {
+            if (currentLang === 'zh') return zhVal;
+            const allGroups = [
+                OPTIONS.waterAmounts, OPTIONS.solidBases, OPTIONS.presetFoods,
+                OPTIONS.solidPortions, OPTIONS.solidIntakes, OPTIONS.playtimeTypes,
+                OPTIONS.walkPlaces
+            ];
+            for (const grp of allGroups) {
+                const found = grp.find(item => item.zh === zhVal);
+                if (found) return found.en;
+            }
+            return zhVal; // custom user-entered foods stay as typed
+        }
+
+        function trDuration(mins) {
+            if (currentLang === 'zh') {
+                if (mins === 60) return '1小時';
+                if (mins === 90) return '1.5小時';
+                return `${mins}分鐘`;
+            } else {
+                if (mins === 60) return '1 hr';
+                if (mins === 90) return '1.5 hrs';
+                return `${mins} mins`;
+            }
+        }
         
         const i18n = {
             zh: {
                 title: "寶寶記錄", langToggle: "中/EN", pee: "小便", poo: "大便",
-                sleep_start: "開始睡", sleep_end: "睡醒了", milk: "飲奶", milk_record: "飲奶記錄",
-                click_to_add_milk: "點擊此處記錄奶量", tab_log: "記錄活動", tab_history: "查看紀錄", tab_summary: "總結",
+                sleep_start: "開始睡", sleep_end: "睡醒了", milk: "飲奶", water: "飲清水",
+                milk_water_btn: "飲奶 / 飲水", solid_food: "加固食品", playtime: "Playtime", walk: "散步外出",
+                tab_log: "記錄活動", tab_history: "查看紀錄", tab_summary: "總結",
                 history_hint: "💡 長按記錄可修改或刪除", time_label: "選擇時間", amount_label: "奶量 (ml)",
+                water_amount_label: "飲水量", solid_base_label: "1. 調配基底 (可複選)",
+                solid_food_label: "2. 食材種類 (可複選)", solid_portion_label: "3. 準備份量",
+                solid_intake_label: "4. 實際表現", post_meal_water: "餐後飲水 (幾啖)",
+                playtime_type_label: "1. Playtime 種類 (可複選)", duration_label: "持續時間",
+                walk_place_label: "2. 地點 / 類型 (選填)", add_food_btn: "➕ 新增食材", add_btn: "加入",
                 cancel: "取消", confirm: "確認", action_title: "選擇操作", edit: "修改記錄", delete: "刪除記錄", 
                 delete_confirm_title: "確定刪除？", delete_confirm_msg: "刪除後將無法恢復。", delete_btn: "確定刪除",
                 no_record: "暫無紀錄", toast_save: "儲存成功！", toast_del: "已刪除", confirm_title_add: "新增記錄", confirm_title_edit: "修改記錄",
-                filter_all: "全部", filter_milk: "飲奶", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠",
-                total_milk: "總奶量", total_pee: "小便", total_poo: "大便", total_sleep: "睡眠",
+                filter_all: "全部", filter_milk_water: "飲奶/水", filter_solid: "加固", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠", filter_activity: "活動",
+                total_milk: "總奶量", total_solid: "加固", total_pee: "小便", total_poo: "大便", total_activity: "活動", total_sleep: "睡眠",
                 swipe_hint: "左右滑動切換日期", today: "今天", gap_prefix: "與上次相距 ", gap_duration: "長度: ", gap_hr: "小時", gap_min: "分",
-                to: "至", reset: "清零", status_connecting: "連線中...", status_cloud: "已連線雲端", status_local: "本機儲存模式"
+                hr_unit: "小時", ongoing: "進行中", to: "至", reset: "清零",
+                status_connecting: "連線中...", status_cloud: "已連線雲端", status_local: "本機儲存模式"
             },
             en: {
                 title: "Baby Tracker", langToggle: "EN/中", pee: "Wet", poo: "Dirty",
-                sleep_start: "Sleep Start", sleep_end: "Wake Up", milk: "Feeding", milk_record: "Milk Log",
-                click_to_add_milk: "Tap to record milk", tab_log: "Record", tab_history: "History", tab_summary: "Summary",
-                history_hint: "💡 Long press to edit/delete", time_label: "Select Time", amount_label: "Amount (ml)",
+                sleep_start: "Sleep Start", sleep_end: "Wake Up", milk: "Milk", water: "Water",
+                milk_water_btn: "Milk / Water", solid_food: "Solid Food", playtime: "Playtime", walk: "Walk",
+                tab_log: "Record", tab_history: "History", tab_summary: "Summary",
+                history_hint: "💡 Long press to edit/delete", time_label: "Select Time", amount_label: "Milk Amount (ml)",
+                water_amount_label: "Water Amount", solid_base_label: "1. Base (Multi-select)",
+                solid_food_label: "2. Ingredients (Multi-select)", solid_portion_label: "3. Portion",
+                solid_intake_label: "4. Intake / Reaction", post_meal_water: "Post-meal Water (Sips)",
+                playtime_type_label: "1. Playtime Type (Multi-select)", duration_label: "Duration",
+                walk_place_label: "2. Place / Type (Optional)", add_food_btn: "➕ Add Food", add_btn: "Add",
                 cancel: "Cancel", confirm: "Confirm", action_title: "Select Action", edit: "Edit", delete: "Delete", 
                 delete_confirm_title: "Delete?", delete_confirm_msg: "Cannot be undone.", delete_btn: "Delete",
                 no_record: "No records", toast_save: "Saved!", toast_del: "Deleted", confirm_title_add: "New Record", confirm_title_edit: "Edit Record",
-                filter_all: "All", filter_milk: "Milk", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep",
-                total_milk: "Total Milk", total_pee: "Wet", total_poo: "Dirty", total_sleep: "Sleeps",
+                filter_all: "All", filter_milk_water: "Milk/Water", filter_solid: "Solids", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep", filter_activity: "Activity",
+                total_milk: "Total Milk", total_solid: "Solids", total_pee: "Wet", total_poo: "Dirty", total_activity: "Activity", total_sleep: "Sleep",
                 swipe_hint: "Swipe to change date", today: "Today", gap_prefix: "Since last: ", gap_duration: "Duration: ", gap_hr: "h ", gap_min: "m",
-                to: "to", reset: "Reset", status_connecting: "Connecting...", status_cloud: "Cloud Sync On", status_local: "Local Storage"
+                hr_unit: "hrs", ongoing: "Ongoing", to: "to", reset: "Reset",
+                status_connecting: "Connecting...", status_cloud: "Cloud Sync On", status_local: "Local Storage"
             }
         };
         
@@ -426,9 +734,16 @@
             'poo': { key: 'poo', icon: 'fa-poop', colorClass: 'bg-[#fed7aa] text-[#9a3412]', borderClass: 'border-[#fdba74]' },
             'sleep_start': { key: 'sleep_start', icon: 'fa-moon', colorClass: 'bg-[#e9d5ff] text-[#581c87]', borderClass: 'border-[#d8b4fe]' },
             'sleep_end': { key: 'sleep_end', icon: 'fa-sun', colorClass: 'bg-[#a5f3fc] text-[#164e63]', borderClass: 'border-[#67e8f9]' },
-            'milk': { key: 'milk', icon: 'fa-bottle-water', colorClass: 'bg-[var(--pastel-bg)] text-[var(--pastel-primary)]', borderClass: 'border-[var(--pastel-primary-light)]' }
+            'milk': { key: 'milk', icon: 'fa-bottle-water', colorClass: 'bg-[var(--pastel-bg)] text-[var(--pastel-primary)]', borderClass: 'border-[var(--pastel-primary-light)]' },
+            'water': { key: 'water', icon: 'fa-glass-water', colorClass: 'bg-[#e0f2fe] text-[#0369a1]', borderClass: 'border-[#7dd3fc]' },
+            'solid_food': { key: 'solid_food', icon: 'fa-bowl-food', colorClass: 'bg-[#fef3c7] text-[#92400e]', borderClass: 'border-[#fcd34d]' },
+            'playtime': { key: 'playtime', icon: 'fa-shapes', colorClass: 'bg-[#d1fae5] text-[#065f46]', borderClass: 'border-[#6ee7b7]' },
+            'walk': { key: 'walk', icon: 'fa-tree', colorClass: 'bg-[#ccfbf1] text-[#115e59]', borderClass: 'border-[#5eead4]' }
         };
         
+        // =========================================================================
+        // STATUS & FIREBASE SYNC
+        // =========================================================================
         function updateStatusUI(state) {
             const dot = document.getElementById('status-dot');
             const text = document.getElementById('status-text');
@@ -453,8 +768,8 @@
                 iconEl.innerHTML = '<i class="fas fa-cloud-check text-green-500"></i>';
                 titleEl.innerText = currentLang === 'zh' ? '🟢 已連線雲端資料庫' : '🟢 Cloud Sync Active';
                 descEl.innerText = currentLang === 'zh'
-                    ? '目前所有紀錄皆即時同步至 Firebase 雲端 (baby_logs)，家人與外傭在不同手機開啟都能看到最新資料。'
-                    : 'All baby records are syncing in real time with Firebase Cloud Firestore (baby_logs).';
+                    ? '目前所有紀錄及自訂食材皆即時同步至 Firebase 雲端 (baby_logs)，家人與外傭在不同手機開啟都能看到最新資料。'
+                    : 'All baby records & custom foods are syncing in real time with Firebase Cloud Firestore (baby_logs).';
             } else {
                 iconEl.innerHTML = '<i class="fas fa-mobile-screen text-gray-500"></i>';
                 titleEl.innerText = currentLang === 'zh' ? '⚪ 本機儲存模式' : '⚪ Local Storage Mode';
@@ -467,11 +782,16 @@
 
         async function initAuth() {
             updateStatusUI('connecting');
+            // Load local custom foods immediately so UI is responsive
             try {
-                // 嘗試匿名登入（若後台未開啟匿名登入，忽略錯誤並直接連線共享資料庫）
+                const localFoods = localStorage.getItem('babyTrackerCustomFoodsLocal');
+                if (localFoods) customFoods = JSON.parse(localFoods);
+            } catch (e) {}
+
+            try {
                 await signInAnonymously(auth);
             } catch (error) {
-                console.info("Anonymous Auth 未啟用，直接嘗試連線 Firestore 共享集合:", error.code || error.message);
+                console.info("Anonymous Auth skipped, connecting directly to shared Firestore:", error.code || error.message);
             }
             subscribeToData();
         }
@@ -480,10 +800,12 @@
             useLocalStorage = true;
             lastCloudError = errorMsg;
             updateStatusUI('local');
-            const saved = localStorage.getItem('babyTrackerLogsLocal');
-            if (saved) {
-                try { logsData = JSON.parse(saved); } catch(e) {}
-            }
+            try {
+                const saved = localStorage.getItem('babyTrackerLogsLocal');
+                if (saved) logsData = JSON.parse(saved);
+                const localFoods = localStorage.getItem('babyTrackerCustomFoodsLocal');
+                if (localFoods) customFoods = JSON.parse(localFoods);
+            } catch(e) {}
             if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
             if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
         }
@@ -497,35 +819,54 @@
         function subscribeToData() {
             if (useLocalStorage) return;
             try {
+                // 1. Subscribe to logs
                 const logsRef = collection(db, COLLECTION_NAME);
                 onSnapshot(logsRef, (snapshot) => {
                     useLocalStorage = false;
                     logsData = snapshot.docs.map(docSnap => ({ id: docSnap.id, ...docSnap.data() }));
-                    // 同步備份一份至本機，確保離線時也有最新資料
                     localStorage.setItem('babyTrackerLogsLocal', JSON.stringify(logsData));
                     updateStatusUI('cloud');
                     if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
                     if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
                 }, (error) => {
-                    console.warn("Firestore 讀取切換至本機模式:", error);
+                    console.warn("Firestore logs read fallback to local:", error);
                     enableLocalMode(error.code || error.message);
                 });
+
+                // 2. Subscribe to custom foods settings
+                const customFoodsDoc = doc(db, 'baby_settings', 'custom_foods');
+                onSnapshot(customFoodsDoc, (docSnap) => {
+                    if (docSnap.exists() && Array.isArray(docSnap.data().items)) {
+                        customFoods = docSnap.data().items;
+                        localStorage.setItem('babyTrackerCustomFoodsLocal', JSON.stringify(customFoods));
+                        if (!document.getElementById('modal-solid-container').classList.contains('hidden')) {
+                            renderSolidChips();
+                        }
+                    }
+                }, (error) => {
+                    console.warn("Custom foods sync warning:", error);
+                });
             } catch (err) {
-                console.warn("Firestore 初始化異常，切換至本機模式:", err);
+                console.warn("Firestore init fallback to local:", err);
                 enableLocalMode(err.message);
             }
         }
         
+        // =========================================================================
+        // LANGUAGE & NAVIGATION
+        // =========================================================================
         window.toggleLanguage = function() {
             currentLang = currentLang === 'zh' ? 'en' : 'zh';
             document.getElementById('lang-toggle-text').innerText = currentLang === 'zh' ? '中/EN' : 'EN/中';
+            document.getElementById('new-food-input').placeholder = currentLang === 'zh' ? '輸入新食材 (如: 三文魚)' : 'Enter new food (e.g. Salmon)';
             updateTexts();
             updateStatusUI(useLocalStorage ? 'local' : 'cloud');
             
             if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
             if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
             if (!document.getElementById('modal-confirm').classList.contains('hidden') && pendingAction) {
-                document.getElementById('modal-confirm-name').innerText = i18n[currentLang][EVENT_DICTIONARY[pendingAction.type].key];
+                updateConfirmModalHeader();
+                renderActiveModalOptions();
             }
         };
         
@@ -550,7 +891,139 @@
         };
         
         window.closeModal = function(id) { document.getElementById(id).classList.add('hidden'); };
-        
+
+        // =========================================================================
+        // MODAL & PLAN A INTERACTIVE OPTIONS
+        // =========================================================================
+        function updateConfirmModalHeader() {
+            if (!pendingAction) return;
+            let effectiveType = pendingAction.type;
+            if (effectiveType === 'milk' && modalState.drinkMode === 'water') effectiveType = 'water';
+            const def = EVENT_DICTIONARY[effectiveType] || EVENT_DICTIONARY[pendingAction.type];
+
+            document.getElementById('modal-confirm-name').innerText = i18n[currentLang][def.key];
+            const iconContainer = document.getElementById('modal-confirm-icon');
+            iconContainer.className = `w-14 h-14 rounded-full flex items-center justify-center text-3xl shadow-inner border-4 ${def.borderClass} ${def.colorClass}`;
+            iconContainer.innerHTML = `<i class="fa-solid ${def.icon}"></i>`;
+            document.getElementById('modal-confirm-title').innerText = pendingAction.mode === 'create'
+                ? i18n[currentLang].confirm_title_add
+                : i18n[currentLang].confirm_title_edit;
+        }
+
+        window.openConfirmModal = function(type, mode = 'create', existingLog = null) {
+            if (navigator.vibrate) navigator.vibrate(40);
+            const normalizedType = (type === 'water') ? 'milk' : type;
+            pendingAction = { type: normalizedType, mode, id: existingLog?.id };
+            
+            // Hide all sub-containers first
+            ['modal-milk-water-container', 'modal-solid-container', 'modal-playtime-container', 'modal-walk-container'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById('add-food-box').classList.add('hidden');
+
+            // Set time
+            const baseTime = existingLog ? new Date(existingLog.timestamp) : new Date();
+            const hrsStr = baseTime.getHours().toString().padStart(2, '0');
+            const minsStr = baseTime.getMinutes().toString().padStart(2, '0');
+            document.getElementById('modal-time').value = `${hrsStr}:${minsStr}`;
+
+            // Initialize state based on type & existingLog
+            if (normalizedType === 'milk') {
+                document.getElementById('modal-milk-water-container').classList.remove('hidden');
+                if (existingLog && existingLog.type === 'water') {
+                    modalState.drinkMode = 'water';
+                    modalState.waterAmount = existingLog.waterAmount || '幾啖';
+                } else {
+                    modalState.drinkMode = 'milk';
+                    document.getElementById('modal-amount-input').value = existingLog ? (existingLog.amount || 0) : 0;
+                }
+                setDrinkMode(modalState.drinkMode, false);
+            } else if (normalizedType === 'solid_food') {
+                document.getElementById('modal-solid-container').classList.remove('hidden');
+                if (existingLog) {
+                    modalState.solidBases = Array.isArray(existingLog.bases) ? [...existingLog.bases] : [];
+                    modalState.solidFoods = Array.isArray(existingLog.foods) ? [...existingLog.foods] : [];
+                    modalState.solidPortion = existingLog.portion || '1 粒冰磚';
+                    modalState.solidIntake = existingLog.intake || '食大半';
+                    modalState.postMealWater = !!existingLog.postMealWater;
+                } else {
+                    modalState.solidBases = [];
+                    modalState.solidFoods = [];
+                    modalState.solidPortion = '1 粒冰磚';
+                    modalState.solidIntake = '食大半';
+                    modalState.postMealWater = false;
+                }
+                renderSolidChips();
+            } else if (normalizedType === 'playtime') {
+                document.getElementById('modal-playtime-container').classList.remove('hidden');
+                if (existingLog) {
+                    modalState.playtimeTypes = Array.isArray(existingLog.activities) ? [...existingLog.activities] : ['地墊時光'];
+                    modalState.playtimeDuration = existingLog.durationMinutes || 15;
+                } else {
+                    modalState.playtimeTypes = ['地墊時光'];
+                    modalState.playtimeDuration = 15;
+                }
+                renderPlaytimeChips();
+            } else if (normalizedType === 'walk') {
+                document.getElementById('modal-walk-container').classList.remove('hidden');
+                if (existingLog) {
+                    modalState.walkDuration = existingLog.durationMinutes || 30;
+                    modalState.walkPlaces = Array.isArray(existingLog.places) ? [...existingLog.places] : [];
+                } else {
+                    modalState.walkDuration = 30;
+                    modalState.walkPlaces = [];
+                }
+                renderWalkChips();
+            }
+
+            updateConfirmModalHeader();
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        };
+
+        function renderActiveModalOptions() {
+            if (!pendingAction) return;
+            if (pendingAction.type === 'milk') setDrinkMode(modalState.drinkMode, false);
+            else if (pendingAction.type === 'solid_food') renderSolidChips();
+            else if (pendingAction.type === 'playtime') renderPlaytimeChips();
+            else if (pendingAction.type === 'walk') renderWalkChips();
+        }
+
+        // --- Drink Mode (Milk vs Plain Water) ---
+        window.setDrinkMode = function(mode, updateHeader = true) {
+            modalState.drinkMode = mode;
+            const btnMilk = document.getElementById('toggle-mode-milk');
+            const btnWater = document.getElementById('toggle-mode-water');
+            const subMilk = document.getElementById('subpanel-milk');
+            const subWater = document.getElementById('subpanel-water');
+
+            if (mode === 'milk') {
+                btnMilk.className = "py-3 rounded-xl font-black text-xl transition-all bg-[var(--pastel-primary)] text-white shadow";
+                btnWater.className = "py-3 rounded-xl font-black text-xl transition-all text-gray-600";
+                subMilk.classList.remove('hidden');
+                subWater.classList.add('hidden');
+            } else {
+                btnWater.className = "py-3 rounded-xl font-black text-xl transition-all bg-sky-500 text-white shadow";
+                btnMilk.className = "py-3 rounded-xl font-black text-xl transition-all text-gray-600";
+                subWater.classList.remove('hidden');
+                subMilk.classList.add('hidden');
+                renderWaterChips();
+            }
+            if (updateHeader) updateConfirmModalHeader();
+        };
+
+        function renderWaterChips() {
+            const container = document.getElementById('water-chips-container');
+            container.innerHTML = OPTIONS.waterAmounts.map(opt => {
+                const isSel = modalState.waterAmount === opt.zh;
+                return `<button type="button" onclick="selectWaterAmount('${opt.zh}')" class="py-3.5 px-3 rounded-2xl font-black text-xl opt-chip ${isSel ? 'selected-sky' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+        }
+
+        window.selectWaterAmount = function(val) {
+            modalState.waterAmount = val;
+            renderWaterChips();
+        };
+
         window.changeModalAmount = function(delta) {
             const input = document.getElementById('modal-amount-input');
             let val = parseInt(input.value, 10) || 0;
@@ -562,35 +1035,133 @@
         window.setModalAmount = function(val) {
             document.getElementById('modal-amount-input').value = val;
         };
-        
-        window.openConfirmModal = function(type, amount = 0, mode = 'create', existingLog = null) {
-            if (navigator.vibrate) navigator.vibrate(40);
-            pendingAction = { type, mode, id: existingLog?.id };
-            const def = EVENT_DICTIONARY[type];
-            document.getElementById('modal-confirm-name').innerText = i18n[currentLang][def.key];
-            
-            const iconContainer = document.getElementById('modal-confirm-icon');
-            iconContainer.className = `w-16 h-16 rounded-full flex items-center justify-center text-4xl shadow-inner border-4 ${def.borderClass} ${def.colorClass}`;
-            iconContainer.innerHTML = `<i class="fa-solid ${def.icon}"></i>`;
-            
-            document.getElementById('modal-confirm-title').innerText = mode === 'create' ? i18n[currentLang].confirm_title_add : i18n[currentLang].confirm_title_edit;
-            
-            const baseTime = existingLog ? new Date(existingLog.timestamp) : new Date();
-            const hrsStr = baseTime.getHours().toString().padStart(2, '0');
-            const minsStr = baseTime.getMinutes().toString().padStart(2, '0');
-            
-            document.getElementById('modal-time').value = `${hrsStr}:${minsStr}`;
-            
-            const amtContainer = document.getElementById('modal-amount-container');
-            if (type === 'milk') {
-                amtContainer.classList.remove('hidden');
-                document.getElementById('modal-amount-input').value = existingLog ? existingLog.amount : (amount || 0);
+
+        // --- Solid Food Chips & Custom Food Sync ---
+        function renderSolidChips() {
+            // 1. Bases (multi-select)
+            document.getElementById('solid-base-chips').innerHTML = OPTIONS.solidBases.map(opt => {
+                const isSel = modalState.solidBases.includes(opt.zh);
+                return `<button type="button" onclick="toggleArrayItem('solidBases', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            // 2. Foods (Presets + Custom Foods + Add Button)
+            const allFoodItems = [
+                ...OPTIONS.presetFoods.map(f => ({ zh: f.zh, label: currentLang === 'zh' ? f.zh : f.en })),
+                ...customFoods.filter(cf => !OPTIONS.presetFoods.some(pf => pf.zh === cf)).map(cf => ({ zh: cf, label: cf }))
+            ];
+
+            let foodsHtml = allFoodItems.map(item => {
+                const isSel = modalState.solidFoods.includes(item.zh);
+                const safeZh = item.zh.replace(/'/g, "\\'");
+                return `<button type="button" onclick="toggleArrayItem('solidFoods', '${safeZh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${item.label}</button>`;
+            }).join('');
+
+            foodsHtml += `<button type="button" onclick="toggleAddFoodBox()" class="px-3.5 py-2 rounded-xl font-black text-base bg-amber-100 text-amber-800 border-2 border-dashed border-amber-400 active:scale-95">${i18n[currentLang].add_food_btn}</button>`;
+            document.getElementById('solid-food-chips').innerHTML = foodsHtml;
+
+            // 3. Portion (single-select)
+            document.getElementById('solid-portion-chips').innerHTML = OPTIONS.solidPortions.map(opt => {
+                const isSel = modalState.solidPortion === opt.zh;
+                return `<button type="button" onclick="setSingleField('solidPortion', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            // 4. Intake (single-select)
+            document.getElementById('solid-intake-chips').innerHTML = OPTIONS.solidIntakes.map(opt => {
+                const isSel = modalState.solidIntake === opt.zh;
+                return `<button type="button" onclick="setSingleField('solidIntake', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            // 5. Post-Meal Water Toggle
+            const waterBtn = document.getElementById('btn-post-meal-water');
+            const waterCheck = document.getElementById('post-meal-water-check');
+            if (modalState.postMealWater) {
+                waterBtn.classList.add('selected-sky');
+                waterCheck.classList.remove('hidden');
             } else {
-                amtContainer.classList.add('hidden');
+                waterBtn.classList.remove('selected-sky');
+                waterCheck.classList.add('hidden');
             }
-            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        window.toggleArrayItem = function(field, val) {
+            const arr = modalState[field];
+            const idx = arr.indexOf(val);
+            if (idx > -1) arr.splice(idx, 1);
+            else arr.push(val);
+            renderActiveModalOptions();
         };
+
+        window.setSingleField = function(field, val) {
+            modalState[field] = val;
+            renderActiveModalOptions();
+        };
+
+        window.togglePostMealWater = function() {
+            modalState.postMealWater = !modalState.postMealWater;
+            renderSolidChips();
+        };
+
+        window.toggleAddFoodBox = function() {
+            const box = document.getElementById('add-food-box');
+            box.classList.toggle('hidden');
+            if (!box.classList.contains('hidden')) {
+                document.getElementById('new-food-input').focus();
+            }
+        };
+
+        window.saveNewCustomFood = async function() {
+            const input = document.getElementById('new-food-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (!customFoods.includes(name) && !OPTIONS.presetFoods.some(p => p.zh === name)) {
+                customFoods.push(name);
+                localStorage.setItem('babyTrackerCustomFoodsLocal', JSON.stringify(customFoods));
+                if (!useLocalStorage) {
+                    try {
+                        await setDoc(doc(db, 'baby_settings', 'custom_foods'), { items: customFoods }, { merge: true });
+                    } catch (e) {
+                        console.warn("Could not sync custom food to cloud:", e);
+                    }
+                }
+            }
+            if (!modalState.solidFoods.includes(name)) {
+                modalState.solidFoods.push(name);
+            }
+            input.value = '';
+            document.getElementById('add-food-box').classList.add('hidden');
+            renderSolidChips();
+        };
+
+        // --- Playtime Chips ---
+        function renderPlaytimeChips() {
+            document.getElementById('playtime-type-chips').innerHTML = OPTIONS.playtimeTypes.map(opt => {
+                const isSel = modalState.playtimeTypes.includes(opt.zh);
+                return `<button type="button" onclick="toggleArrayItem('playtimeTypes', '${opt.zh}')" class="px-3.5 py-2.5 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-green' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            document.getElementById('playtime-duration-chips').innerHTML = OPTIONS.playtimeDurations.map(opt => {
+                const isSel = modalState.playtimeDuration === opt.mins;
+                return `<button type="button" onclick="setSingleField('playtimeDuration', ${opt.mins})" class="py-3 rounded-xl font-black text-base opt-chip ${isSel ? 'selected-green' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+        }
+
+        // --- Walk Chips ---
+        function renderWalkChips() {
+            document.getElementById('walk-duration-chips').innerHTML = OPTIONS.walkDurations.map(opt => {
+                const isSel = modalState.walkDuration === opt.mins;
+                return `<button type="button" onclick="setSingleField('walkDuration', ${opt.mins})" class="py-3 rounded-xl font-black text-base opt-chip ${isSel ? 'selected-sky' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            document.getElementById('walk-place-chips').innerHTML = OPTIONS.walkPlaces.map(opt => {
+                const isSel = modalState.walkPlaces.includes(opt.zh);
+                return `<button type="button" onclick="toggleArrayItem('walkPlaces', '${opt.zh}')" class="px-3.5 py-2.5 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-sky' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+        }
         
+        // =========================================================================
+        // SAVE LOG TO CLOUD / LOCAL
+        // =========================================================================
         window.confirmSaveLog = async function() {
             if (!pendingAction) return;
             const timeVal = document.getElementById('modal-time').value;
@@ -601,14 +1172,37 @@
             const baseTime = existingItem ? new Date(existingItem.timestamp) : new Date();
             baseTime.setHours(hr, mn, 0, 0);
             
-            let finalAmount = 0;
+            let logData = { timestamp: baseTime.getTime() };
+
             if (pendingAction.type === 'milk') {
-                finalAmount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
+                if (modalState.drinkMode === 'milk') {
+                    logData.type = 'milk';
+                    logData.amount = parseInt(document.getElementById('modal-amount-input').value, 10) || 0;
+                } else {
+                    logData.type = 'water';
+                    logData.waterAmount = modalState.waterAmount;
+                }
+            } else if (pendingAction.type === 'solid_food') {
+                logData.type = 'solid_food';
+                logData.bases = [...modalState.solidBases];
+                logData.foods = [...modalState.solidFoods];
+                logData.portion = modalState.solidPortion;
+                logData.intake = modalState.solidIntake;
+                logData.postMealWater = modalState.postMealWater;
+            } else if (pendingAction.type === 'playtime') {
+                logData.type = 'playtime';
+                logData.activities = modalState.playtimeTypes.length > 0 ? [...modalState.playtimeTypes] : ['地墊時光'];
+                logData.durationMinutes = modalState.playtimeDuration || 15;
+            } else if (pendingAction.type === 'walk') {
+                logData.type = 'walk';
+                logData.durationMinutes = modalState.walkDuration || 30;
+                logData.places = [...modalState.walkPlaces];
+            } else {
+                logData.type = pendingAction.type;
             }
-            const logData = { type: pendingAction.type, timestamp: baseTime.getTime(), amount: finalAmount };
+
             const docId = pendingAction.mode === 'edit' ? pendingAction.id : Date.now().toString() + Math.random().toString(36).substring(2, 7);
 
-            // 先關閉視窗並顯示成功提示，給長輩最即時的操作回饋
             closeModal('modal-confirm');
             showToast(i18n[currentLang].toast_save);
 
@@ -624,10 +1218,11 @@
             }
             
             try {
+                // Overwrite completely (no merge) so switching between milk & water cleans old fields cleanly
                 const docRef = doc(db, COLLECTION_NAME, docId);
-                await setDoc(docRef, logData, { merge: true });
+                await setDoc(docRef, logData);
             } catch (error) { 
-                console.warn("Firebase Save 失敗，自動轉為本機儲存:", error);
+                console.warn("Firebase Save failed, falling back to local:", error);
                 enableLocalMode(error.code || error.message);
                 if (pendingAction.mode === 'edit') {
                     const idx = logsData.findIndex(l => l.id === pendingAction.id);
@@ -639,6 +1234,9 @@
             }
         };
         
+        // =========================================================================
+        // DATE HELPERS & SWIPE
+        // =========================================================================
         function getLogsForDay(dateObj) {
             const startOfDay = new Date(dateObj);
             startOfDay.setHours(0,0,0,0);
@@ -681,6 +1279,9 @@
             }, {passive: true});
         }
         
+        // =========================================================================
+        // TAB 2: HISTORY LIST & TIME GAP (1 decimal place for sleep duration)
+        // =========================================================================
         function getGapText(log) {
             const sorted = [...logsData].sort((a, b) => b.timestamp - a.timestamp);
             const idx = sorted.findIndex(l => l.id === log.id);
@@ -694,13 +1295,43 @@
             const diffMs = log.timestamp - prevLog.timestamp;
             if (diffMs < 0) return '';
             
+            // For sleep_end: strictly format sleep duration in hours to 1 decimal place (e.g., 1.5 小時 / 2.0 小時)
+            if (log.type === 'sleep_end') {
+                const hrs1Dec = (diffMs / 3600000).toFixed(1);
+                return `${i18n[currentLang].gap_duration}${hrs1Dec} ${i18n[currentLang].hr_unit}`;
+            }
+
             const diffHrs = Math.floor(diffMs / 3600000);
             const diffMins = Math.floor((diffMs % 3600000) / 60000);
             if (diffHrs === 0 && diffMins === 0) return ''; 
             
             const hStr = diffHrs > 0 ? `${diffHrs}${i18n[currentLang].gap_hr}` : '';
             const mStr = `${diffMins}${i18n[currentLang].gap_min}`;
-            return log.type === 'sleep_end' ? `${i18n[currentLang].gap_duration}${hStr}${mStr}` : `${i18n[currentLang].gap_prefix}${hStr}${mStr}`;
+            return `${i18n[currentLang].gap_prefix}${hStr}${mStr}`;
+        }
+
+        function formatLogSummaryText(log) {
+            if (log.type === 'solid_food') {
+                const parts = [];
+                if (log.bases && log.bases.length) parts.push(log.bases.map(trOpt).join('+'));
+                if (log.foods && log.foods.length) parts.push(log.foods.map(trOpt).join('、'));
+                const sub = [];
+                if (log.portion) sub.push(trOpt(log.portion));
+                if (log.intake) sub.push(trOpt(log.intake));
+                if (log.postMealWater) sub.push(currentLang === 'zh' ? '💧餐後飲水' : '💧Post-water');
+                let res = parts.join(' · ');
+                if (sub.length) res += (res ? ` (${sub.join(' · ')})` : sub.join(' · '));
+                return res;
+            } else if (log.type === 'playtime') {
+                const acts = (log.activities || []).map(trOpt).join('、');
+                const dur = trDuration(log.durationMinutes || 15);
+                return acts ? `${acts} (${dur})` : dur;
+            } else if (log.type === 'walk') {
+                const dur = trDuration(log.durationMinutes || 30);
+                const pls = (log.places || []).map(trOpt).join('、');
+                return pls ? `${pls} (${dur})` : dur;
+            }
+            return '';
         }
         
         window.setFilter = function(f) {
@@ -723,7 +1354,9 @@
             dayLogs.sort((a, b) => b.timestamp - a.timestamp);
             if (currentFilter !== 'all') {
                 dayLogs = dayLogs.filter(log => {
+                    if (currentFilter === 'milk_water') return log.type === 'milk' || log.type === 'water';
                     if (currentFilter === 'sleep') return log.type === 'sleep_start' || log.type === 'sleep_end';
+                    if (currentFilter === 'activity') return log.type === 'playtime' || log.type === 'walk';
                     return log.type === currentFilter;
                 });
             }
@@ -735,25 +1368,37 @@
             dayLogs.forEach(log => {
                 const d = new Date(log.timestamp);
                 const timeStr = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
-                const def = EVENT_DICTIONARY[log.type];
-                let extraInfo = log.type === 'milk' && log.amount ? `<span class="ml-auto text-2xl font-black text-[var(--pastel-primary)]">${log.amount} <span class="text-sm">ml</span></span>` : '';
-                let gapText = getGapText(log);
-                let gapHtml = gapText ? `<div class="text-xs font-bold text-gray-400 mt-1">${gapText}</div>` : '';
+                const def = EVENT_DICTIONARY[log.type] || EVENT_DICTIONARY['pee'];
+                
+                let rightBadge = '';
+                if (log.type === 'milk' && log.amount) {
+                    rightBadge = `<span class="ml-2 text-2xl font-black text-[var(--pastel-primary)] flex-shrink-0">${log.amount} <span class="text-sm">ml</span></span>`;
+                } else if (log.type === 'water') {
+                    rightBadge = `<span class="ml-2 text-lg font-black text-sky-600 bg-sky-50 px-2.5 py-1 rounded-xl border border-sky-200 flex-shrink-0">${trOpt(log.waterAmount || '幾啖')}</span>`;
+                } else if (log.type === 'playtime' || log.type === 'walk') {
+                    rightBadge = `<span class="ml-2 text-base font-black text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200 flex-shrink-0">${trDuration(log.durationMinutes || 15)}</span>`;
+                }
+
+                const detailDesc = formatLogSummaryText(log);
+                const detailHtml = detailDesc ? `<div class="text-sm font-bold text-gray-600 mt-0.5 leading-snug">${detailDesc}</div>` : '';
+                const gapText = getGapText(log);
+                const gapHtml = gapText ? `<div class="text-xs font-bold text-gray-400 mt-0.5">${gapText}</div>` : '';
                 
                 html += `
-                    <div class="history-item flex items-center p-4 rounded-2xl mb-2 bg-white shadow-sm border border-gray-200 active:bg-gray-50"
+                    <div class="history-item flex items-center p-3.5 rounded-2xl bg-white shadow-sm border border-gray-200 active:bg-gray-50"
                          oncontextmenu="return false;"
                          onmousedown="handleTouchStart('${log.id}')" onmouseup="handleTouchEnd()" onmouseleave="handleTouchEnd()"
                          ontouchstart="handleTouchStart('${log.id}')" ontouchend="handleTouchEnd()" ontouchmove="handleTouchEnd()">
-                        <div class="w-16 text-left flex-shrink-0"><span class="text-xl font-black text-gray-400">${timeStr}</span></div>
-                        <div class="w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-inner flex-shrink-0 border-2 ${def.borderClass} ${def.colorClass}">
-                            <i class="fa-solid ${def.icon} text-xl"></i>
+                        <div class="w-14 text-left flex-shrink-0"><span class="text-lg font-black text-gray-400">${timeStr}</span></div>
+                        <div class="w-11 h-11 rounded-full flex items-center justify-center mr-3 shadow-inner flex-shrink-0 border-2 ${def.borderClass} ${def.colorClass}">
+                            <i class="fa-solid ${def.icon} text-lg"></i>
                         </div>
-                        <div class="flex flex-col flex-1">
+                        <div class="flex flex-col flex-1 min-w-0">
                             <span class="text-xl font-black text-gray-700 leading-tight">${i18n[currentLang][def.key]}</span>
+                            ${detailHtml}
                             ${gapHtml}
                         </div>
-                        ${extraInfo}
+                        ${rightBadge}
                     </div>
                 `;
             });
@@ -774,7 +1419,7 @@
         window.initiateEditLog = function() {
             closeModal('modal-action');
             const log = logsData.find(l => l.id === selectedLogId);
-            if (log) openConfirmModal(log.type, log.amount, 'edit', log);
+            if (log) openConfirmModal(log.type, 'edit', log);
         };
         
         window.initiateDeleteLog = function() {
@@ -797,29 +1442,37 @@
                 const docRef = doc(db, COLLECTION_NAME, targetId);
                 await deleteDoc(docRef);
             } catch (error) { 
-                console.warn("Firebase Delete 失敗，切換本機刪除:", error);
+                console.warn("Firebase Delete failed, switching to local delete:", error);
                 enableLocalMode(error.code || error.message);
                 logsData = logsData.filter(l => l.id !== targetId);
                 saveLocalData();
             }
         };
         
+        // =========================================================================
+        // TAB 3: SUMMARY & 5-TRACK 24H GANTT CHART
+        // =========================================================================
         function updateSummaryUI() {
             updateDateDisplay('summary');
             let dayLogs = getLogsForDay(summaryDate);
             dayLogs.sort((a, b) => a.timestamp - b.timestamp);
             
-            let totalMilk = 0, countPee = 0, countPoo = 0;
+            let totalMilk = 0, countSolid = 0, countPee = 0, countPoo = 0, totalActivityMins = 0;
             dayLogs.forEach(log => {
-                if (log.type === 'milk') totalMilk += log.amount;
+                if (log.type === 'milk') totalMilk += (log.amount || 0);
+                else if (log.type === 'solid_food') countSolid++;
                 else if (log.type === 'pee') countPee++;
                 else if (log.type === 'poo') countPoo++;
+                else if (log.type === 'playtime' || log.type === 'walk') totalActivityMins += (log.durationMinutes || 0);
             });
             
             document.getElementById('stat-milk').innerText = totalMilk;
+            document.getElementById('stat-solid').innerText = countSolid;
             document.getElementById('stat-pee').innerText = countPee;
             document.getElementById('stat-poo').innerText = countPoo;
+            document.getElementById('stat-activity').innerText = (totalActivityMins / 60).toFixed(1);
             
+            // Sleep Calculation - ALWAYS strictly formatted with .toFixed(1) (e.g., 9.0, 2.3)
             let totalSleepMs = 0;
             let daySleepLogs = dayLogs.filter(l => l.type === 'sleep_start' || l.type === 'sleep_end');
             
@@ -848,8 +1501,7 @@
                 }
             }
             
-            const rawSleepHours = (totalSleepMs / 3600000).toFixed(1);
-            const formattedSleepHours = parseFloat(rawSleepHours);
+            const formattedSleepHours = (totalSleepMs / 3600000).toFixed(1);
             document.getElementById('stat-sleep').innerText = formattedSleepHours;
             
             const hasData = dayLogs.length > 0;
@@ -859,9 +1511,10 @@
         
         function drawGanttChart(dayLogs) {
             const tracks = {
-                'milk': document.getElementById('track-milk'),
-                'pee': document.getElementById('track-pee'),
-                'poo': document.getElementById('track-poo'),
+                'milkWater': document.getElementById('track-milk-water'),
+                'solid': document.getElementById('track-solid'),
+                'excretion': document.getElementById('track-excretion'),
+                'activity': document.getElementById('track-activity'),
                 'sleep': document.getElementById('track-sleep')
             };
             Object.values(tracks).forEach(t => t.innerHTML = '');
@@ -870,20 +1523,32 @@
             dayLogs.forEach(log => {
                 const date = new Date(log.timestamp);
                 const percent = ((date.getHours() + date.getMinutes() / 60) / 24) * 100;
+                
                 if (log.type === 'milk') {
-                    addGanttDot(tracks.milk, percent, log, 'bg-[var(--pastel-primary-light)] border-[var(--pastel-primary)]');
+                    addGanttDot(tracks.milkWater, percent, log, 'bg-[var(--pastel-primary-light)] border-[var(--pastel-primary)]');
+                } else if (log.type === 'water') {
+                    addGanttDot(tracks.milkWater, percent, log, 'bg-[#bae6fd] border-[#0284c7]');
+                } else if (log.type === 'solid_food') {
+                    addGanttDot(tracks.solid, percent, log, 'bg-[#fde68a] border-[#d97706]');
                 } else if (log.type === 'pee') {
-                    addGanttDot(tracks.pee, percent, log, 'bg-[#fef08a] border-[#eab308]');
+                    addGanttDot(tracks.excretion, percent, log, 'bg-[#fef08a] border-[#eab308]');
                 } else if (log.type === 'poo') {
-                    addGanttDot(tracks.poo, percent, log, 'bg-[#fed7aa] border-[#f97316]');
+                    addGanttDot(tracks.excretion, percent, log, 'bg-[#fed7aa] border-[#ea580c]');
+                } else if (log.type === 'playtime' || log.type === 'walk') {
+                    const durMins = log.durationMinutes || 15;
+                    const endPercent = Math.min(100, percent + (durMins / 1440) * 100);
+                    const barColor = log.type === 'playtime'
+                        ? 'bg-[#6ee7b7] border-[#059669]'
+                        : 'bg-[#5eead4] border-[#0d9488]';
+                    addGanttBar(tracks.activity, percent, endPercent, log, null, barColor);
                 } else if (log.type === 'sleep_start') {
                     activeSleep = { log: log, startPercent: percent };
                 } else if (log.type === 'sleep_end') {
                     if (activeSleep) {
-                        addGanttBar(tracks.sleep, activeSleep.startPercent, percent, activeSleep.log, log);
+                        addGanttBar(tracks.sleep, activeSleep.startPercent, percent, activeSleep.log, log, 'bg-[#d8b4fe] border-[#9333ea]');
                         activeSleep = null;
                     } else {
-                        addGanttBar(tracks.sleep, 0, percent, {timestamp: new Date(summaryDate).setHours(0,0,0,0), type: 'sleep_start'}, log);
+                        addGanttBar(tracks.sleep, 0, percent, {timestamp: new Date(summaryDate).setHours(0,0,0,0), type: 'sleep_start'}, log, 'bg-[#d8b4fe] border-[#9333ea]');
                     }
                 }
             });
@@ -891,10 +1556,10 @@
             if (activeSleep) {
                 const today = new Date();
                 let endPercent = 100;
-                if (summaryDate.getDate() === today.getDate() && summaryDate.getMonth() === today.getMonth()) {
+                if (summaryDate.getDate() === today.getDate() && summaryDate.getMonth() === today.getMonth() && summaryDate.getFullYear() === today.getFullYear()) {
                     endPercent = ((today.getHours() + today.getMinutes() / 60) / 24) * 100;
                 }
-                addGanttBar(tracks.sleep, activeSleep.startPercent, endPercent, activeSleep.log, null);
+                addGanttBar(tracks.sleep, activeSleep.startPercent, endPercent, activeSleep.log, null, 'bg-[#d8b4fe] border-[#9333ea]');
             }
         }
         
@@ -906,12 +1571,12 @@
             container.appendChild(div);
         }
         
-        function addGanttBar(container, startPercent, endPercent, logStart, logEnd) {
+        function addGanttBar(container, startPercent, endPercent, logStart, logEnd, colorClasses) {
             const div = document.createElement('div');
-            div.className = `absolute top-1/2 -translate-y-1/2 h-[60%] rounded-full bg-[#d8b4fe] border-2 border-[#9333ea] shadow-sm z-10 opacity-90 cursor-pointer`;
+            div.className = `absolute top-1/2 -translate-y-1/2 h-[62%] rounded-full border-2 shadow-sm z-10 opacity-90 cursor-pointer ${colorClasses}`;
             div.style.left = `${startPercent}%`;
             let width = endPercent - startPercent;
-            if (width < 2) width = 2; 
+            if (width < 2.2) width = 2.2; 
             div.style.width = `${width}%`;
             div.onclick = (e) => { e.stopPropagation(); openSingleDetail(logStart, logEnd); };
             container.appendChild(div);
@@ -920,7 +1585,7 @@
         window.openSingleDetail = function(log, logEnd = null) {
             const def = EVENT_DICTIONARY[log.type] || EVENT_DICTIONARY['sleep_start']; 
             const iconContainer = document.getElementById('single-detail-icon');
-            iconContainer.className = `w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-4 border-4 ${def.borderClass} ${def.colorClass}`;
+            iconContainer.className = `w-20 h-20 rounded-full mx-auto flex items-center justify-center text-4xl shadow-inner mb-3 border-4 ${def.borderClass} ${def.colorClass}`;
             iconContainer.innerHTML = `<i class="fa-solid ${def.icon}"></i>`;
             
             document.getElementById('single-detail-title').innerText = i18n[currentLang][def.key];
@@ -933,17 +1598,23 @@
             
             if (log.type === 'milk' && log.amount) {
                 extraStr = `${log.amount} ml`;
+            } else if (log.type === 'water') {
+                extraStr = trOpt(log.waterAmount || '幾啖');
+            } else if (log.type === 'solid_food' || log.type === 'playtime' || log.type === 'walk') {
+                extraStr = formatLogSummaryText(log);
             } else if (log.type === 'sleep_start') {
                 if (logEnd) {
                     const dEnd = new Date(logEnd.timestamp);
                     const tEnd = `${dEnd.getHours().toString().padStart(2,'0')}:${dEnd.getMinutes().toString().padStart(2,'0')}`;
                     timeStr = `${tStart} ${i18n[currentLang].to} ${tEnd}`;
                     const diffMs = logEnd.timestamp - log.timestamp;
-                    const h = Math.floor(diffMs / 3600000);
-                    const m = Math.floor((diffMs % 3600000) / 60000);
-                    extraStr = `${h}${i18n[currentLang].gap_hr}${m}${i18n[currentLang].gap_min}`;
+                    const hrs1Dec = (Math.max(0, diffMs) / 3600000).toFixed(1);
+                    extraStr = `${hrs1Dec} ${i18n[currentLang].hr_unit}`;
                 } else {
-                    timeStr = `${tStart} - (進行中)`;
+                    const nowMs = Date.now();
+                    const hrs1Dec = (Math.max(0, nowMs - log.timestamp) / 3600000).toFixed(1);
+                    timeStr = `${tStart} - (${i18n[currentLang].ongoing})`;
+                    extraStr = `${hrs1Dec} ${i18n[currentLang].hr_unit} (${i18n[currentLang].ongoing})`;
                 }
             }
             document.getElementById('single-detail-time').innerText = timeStr;
