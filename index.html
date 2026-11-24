@@ -439,16 +439,29 @@
                     <div class="flex flex-wrap gap-2" id="solid-food-chips"></div>
                     
                     <!-- Inline Add New Food Input -->
-                    <div id="add-food-box" class="hidden mt-2.5 flex gap-2">
-                        <input type="text" id="new-food-input" placeholder="輸入新食材 (如: 三文魚)" class="flex-1 px-3 py-2.5 rounded-xl border-2 border-amber-400 font-bold text-base focus:outline-none">
-                        <button type="button" onclick="saveNewCustomFood()" class="bg-amber-500 text-white px-4 py-2.5 rounded-xl font-black text-base active:scale-95" data-i18n="add_btn">加入</button>
+                    <div id="add-food-box" class="hidden mt-2.5 flex items-center gap-2 w-full">
+                        <input type="text" id="new-food-input" placeholder="輸入新食材 (如: 三文魚)" class="w-full min-w-0 flex-1 px-3 py-3 rounded-xl border-2 border-amber-400 font-bold text-base focus:outline-none">
+                        <button type="button" onclick="saveNewCustomFood()" class="flex-shrink-0 whitespace-nowrap bg-amber-500 text-white px-4 py-3 rounded-xl font-black text-base active:scale-95" data-i18n="add_btn">加入</button>
                     </div>
                 </div>
 
-                <!-- Portion (Single-select) -->
+                <!-- Portion (Quick Presets + Manual Quantity & Unit Selector) -->
                 <div>
                     <label class="block text-amber-800 font-black mb-1.5 text-base" data-i18n="solid_portion_label">3. 準備份量</label>
-                    <div class="flex flex-wrap gap-2" id="solid-portion-chips"></div>
+                    <!-- Quick Presets -->
+                    <div class="flex flex-wrap gap-2 mb-2.5" id="solid-portion-presets"></div>
+                    <!-- Custom Quantity + Unit Builder -->
+                    <div class="bg-amber-50/70 p-2.5 rounded-2xl border-2 border-amber-200 space-y-2.5">
+                        <div class="flex items-center justify-between gap-2 w-full">
+                            <span class="text-xs sm:text-sm font-black text-amber-800 whitespace-nowrap flex-shrink-0" data-i18n="custom_portion_label">自訂數量+單位</span>
+                            <div class="flex items-center gap-1.5 flex-1 min-w-0 justify-end">
+                                <button type="button" onclick="stepSolidQty(-0.5)" class="w-11 h-11 rounded-xl bg-white border-2 border-amber-300 text-amber-800 font-black text-2xl flex items-center justify-center shadow-sm active:scale-95 flex-shrink-0">−</button>
+                                <input type="number" id="solid-portion-qty" step="0.5" min="0" value="1" oninput="onSolidQtyInput()" class="w-20 min-w-0 h-11 bg-white rounded-xl border-2 border-amber-400 text-center text-xl font-black text-gray-800 focus:outline-none">
+                                <button type="button" onclick="stepSolidQty(0.5)" class="w-11 h-11 rounded-xl bg-white border-2 border-amber-300 text-amber-800 font-black text-2xl flex items-center justify-center shadow-sm active:scale-95 flex-shrink-0">+</button>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-1.5" id="solid-portion-units"></div>
+                    </div>
                 </div>
 
                 <!-- Intake / Reaction (Single-select) -->
@@ -610,7 +623,9 @@
             waterAmount: '幾啖',
             solidBases: [],
             solidFoods: [],
-            solidPortion: '1 粒冰磚',
+            solidPortionPreset: '1 粒冰磚',
+            solidPortionQty: 1,
+            solidPortionUnit: '粒冰磚',
             solidIntake: '食大半',
             postMealWater: false,
             playtimeTypes: ['地墊時光'],
@@ -643,12 +658,25 @@
                 { zh: '西蘭花蓉', en: 'Broccoli' },
                 { zh: '牛油果', en: 'Avocado' }
             ],
-            solidPortions: [
-                { zh: '1 粒冰磚', en: '1 Cube' },
-                { zh: '2 粒冰磚', en: '2 Cubes' },
-                { zh: '3 粒冰磚', en: '3 Cubes' },
-                { zh: '1-2 湯匙', en: '1-2 Tbsp' },
-                { zh: '半碗', en: 'Half Bowl' }
+            solidPortionPresets: [
+                { preset: '1 粒冰磚', qty: 1, unit: '粒冰磚', zh: '1 粒冰磚', en: '1 Cube' },
+                { preset: '2 粒冰磚', qty: 2, unit: '粒冰磚', zh: '2 粒冰磚', en: '2 Cubes' },
+                { preset: '3 粒冰磚', qty: 3, unit: '粒冰磚', zh: '3 粒冰磚', en: '3 Cubes' },
+                { preset: '1-2 湯匙', qty: 1.5, unit: '湯匙', zh: '1-2 湯匙', en: '1-2 Tbsp' },
+                { preset: '半碗', qty: 0.5, unit: '碗', zh: '半碗', en: 'Half Bowl' }
+            ],
+            solidUnits: [
+                { zh: '粒冰磚', en: 'Cube(s)' },
+                { zh: '湯匙', en: 'Tbsp' },
+                { zh: '碗', en: 'Bowl' },
+                { zh: '個', en: 'Whole' },
+                { zh: '條', en: 'Strip' },
+                { zh: '塊', en: 'Slice' },
+                { zh: '件', en: 'Piece' },
+                { zh: '片', en: 'Sheet/Slice' },
+                { zh: '粒', en: 'Pellet/Bit' },
+                { zh: 'g', en: 'g' },
+                { zh: 'ml', en: 'ml' }
             ],
             solidIntakes: [
                 { zh: '試味 (幾啖)', en: 'Tasted (Sips)' },
@@ -690,17 +718,64 @@
         };
 
         function trOpt(zhVal) {
+            if (!zhVal) return '';
             if (currentLang === 'zh') return zhVal;
             const allGroups = [
                 OPTIONS.waterAmounts, OPTIONS.solidBases, OPTIONS.presetFoods,
-                OPTIONS.solidPortions, OPTIONS.solidIntakes, OPTIONS.playtimeTypes,
-                OPTIONS.walkPlaces
+                OPTIONS.solidPortionPresets, OPTIONS.solidUnits, OPTIONS.solidIntakes,
+                OPTIONS.playtimeTypes, OPTIONS.walkPlaces
             ];
             for (const grp of allGroups) {
                 const found = grp.find(item => item.zh === zhVal);
                 if (found) return found.en;
             }
+            // Handle dynamic "qty unit" strings like "2 條" or "0.5 碗"
+            const match = String(zhVal).match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+            if (match) {
+                const num = parseFloat(match[1]);
+                const unitZh = match[2].trim();
+                if (num === 0.5 && unitZh === '碗') return 'Half Bowl';
+                const unitObj = OPTIONS.solidUnits.find(u => u.zh === unitZh);
+                if (unitObj) return `${num} ${unitObj.en}`;
+            }
             return zhVal;
+        }
+
+        function formatPortionString(qty, unit) {
+            const cleanQty = parseFloat(qty);
+            if (isNaN(cleanQty) || cleanQty <= 0) return `1 ${unit}`;
+            if (cleanQty === 0.5 && unit === '碗') return '半碗';
+            return `${cleanQty} ${unit}`;
+        }
+
+        function parsePortionString(portionStr, existingLog = null) {
+            if (existingLog && existingLog.portionPreset) {
+                const presetObj = OPTIONS.solidPortionPresets.find(p => p.preset === existingLog.portionPreset);
+                if (presetObj) {
+                    return { preset: presetObj.preset, qty: presetObj.qty, unit: presetObj.unit };
+                }
+            }
+            if (existingLog && existingLog.portionQty !== undefined && existingLog.portionUnit) {
+                const matchedPreset = OPTIONS.solidPortionPresets.find(
+                    p => p.qty === parseFloat(existingLog.portionQty) && p.unit === existingLog.portionUnit && p.preset !== '1-2 湯匙'
+                );
+                return {
+                    preset: matchedPreset ? matchedPreset.preset : null,
+                    qty: parseFloat(existingLog.portionQty) || 1,
+                    unit: existingLog.portionUnit
+                };
+            }
+            if (!portionStr) return { preset: '1 粒冰磚', qty: 1, unit: '粒冰磚' };
+            if (portionStr === '半碗') return { preset: '半碗', qty: 0.5, unit: '碗' };
+            if (portionStr === '1-2 湯匙') return { preset: '1-2 湯匙', qty: 1.5, unit: '湯匙' };
+            const match = String(portionStr).match(/^(\d+(?:\.\d+)?)\s*(.+)$/);
+            if (match) {
+                const qty = parseFloat(match[1]) || 1;
+                const unit = match[2].trim();
+                const matchedPreset = OPTIONS.solidPortionPresets.find(p => p.qty === qty && p.unit === unit && p.preset !== '1-2 湯匙');
+                return { preset: matchedPreset ? matchedPreset.preset : null, qty, unit };
+            }
+            return { preset: null, qty: 1, unit: '粒冰磚' };
         }
 
         function trDuration(mins) {
@@ -724,6 +799,7 @@
                 history_hint: "💡 長按可修改/刪除", time_label: "選擇時間", amount_label: "奶量 (ml)",
                 water_amount_label: "飲水量", solid_base_label: "1. 調配基底 (可複選)",
                 solid_food_label: "2. 食材種類 (可複選)", solid_portion_label: "3. 準備份量",
+                custom_portion_label: "自訂數量+單位",
                 solid_intake_label: "4. 實際表現", post_meal_water: "餐後飲水 (幾啖)",
                 playtime_type_label: "1. Playtime 種類 (可複選)", duration_label: "持續時間",
                 walk_place_label: "2. 地點 / 類型 (選填)", add_food_btn: "➕ 新增食材", add_btn: "加入",
@@ -746,6 +822,7 @@
                 history_hint: "💡 Long press to edit/delete", time_label: "Select Time", amount_label: "Milk Amount (ml)",
                 water_amount_label: "Water Amount", solid_base_label: "1. Base (Multi-select)",
                 solid_food_label: "2. Ingredients (Multi-select)", solid_portion_label: "3. Portion",
+                custom_portion_label: "Custom Qty + Unit",
                 solid_intake_label: "4. Intake / Reaction", post_meal_water: "Post-meal Water (Sips)",
                 playtime_type_label: "1. Playtime Type (Multi-select)", duration_label: "Duration",
                 walk_place_label: "2. Place / Type (Optional)", add_food_btn: "➕ Add Food", add_btn: "Add",
@@ -864,7 +941,7 @@
                     enableLocalMode(error.code || error.message);
                 });
 
-                const customFoodsDoc = doc(db, 'baby_settings', 'custom_foods');
+                const customFoodsDoc = doc(db, 'baby_custom_foods', 'shared_list');
                 onSnapshot(customFoodsDoc, (docSnap) => {
                     if (docSnap.exists() && Array.isArray(docSnap.data().items)) {
                         customFoods = docSnap.data().items;
@@ -972,13 +1049,18 @@
                 if (existingLog) {
                     modalState.solidBases = Array.isArray(existingLog.bases) ? [...existingLog.bases] : [];
                     modalState.solidFoods = Array.isArray(existingLog.foods) ? [...existingLog.foods] : [];
-                    modalState.solidPortion = existingLog.portion || '1 粒冰磚';
+                    const parsed = parsePortionString(existingLog.portion, existingLog);
+                    modalState.solidPortionPreset = parsed.preset;
+                    modalState.solidPortionQty = parsed.qty;
+                    modalState.solidPortionUnit = parsed.unit;
                     modalState.solidIntake = existingLog.intake || '食大半';
                     modalState.postMealWater = !!existingLog.postMealWater;
                 } else {
                     modalState.solidBases = [];
                     modalState.solidFoods = [];
-                    modalState.solidPortion = '1 粒冰磚';
+                    modalState.solidPortionPreset = '1 粒冰磚';
+                    modalState.solidPortionQty = 1;
+                    modalState.solidPortionUnit = '粒冰磚';
                     modalState.solidIntake = '食大半';
                     modalState.postMealWater = false;
                 }
@@ -1065,6 +1147,20 @@
             document.getElementById('modal-amount-input').value = val;
         };
 
+        window.toggleArrayItem = function(field, val) {
+            const arr = modalState[field];
+            if (!Array.isArray(arr)) return;
+            const idx = arr.indexOf(val);
+            if (idx > -1) arr.splice(idx, 1);
+            else arr.push(val);
+            renderActiveModalOptions();
+        };
+
+        window.setSingleField = function(field, val) {
+            modalState[field] = val;
+            renderActiveModalOptions();
+        };
+
         // --- Solid Food Chips & Custom Food Sync ---
         function renderSolidChips() {
             document.getElementById('solid-base-chips').innerHTML = OPTIONS.solidBases.map(opt => {
@@ -1086,16 +1182,31 @@
             foodsHtml += `<button type="button" onclick="toggleAddFoodBox()" class="px-3.5 py-2 rounded-xl font-black text-base bg-amber-100 text-amber-800 border-2 border-dashed border-amber-400 active:scale-95">${i18n[currentLang].add_food_btn}</button>`;
             document.getElementById('solid-food-chips').innerHTML = foodsHtml;
 
-            document.getElementById('solid-portion-chips').innerHTML = OPTIONS.solidPortions.map(opt => {
-                const isSel = modalState.solidPortion === opt.zh;
-                return `<button type="button" onclick="setSingleField('solidPortion', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            // Quick Presets for Portion
+            document.getElementById('solid-portion-presets').innerHTML = OPTIONS.solidPortionPresets.map(opt => {
+                const isSel = modalState.solidPortionPreset === opt.preset;
+                return `<button type="button" onclick="applySolidPortionPreset('${opt.preset}', ${opt.qty}, '${opt.unit}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
             }).join('');
 
+            // Sync numeric input box
+            const qtyInput = document.getElementById('solid-portion-qty');
+            if (qtyInput && document.activeElement !== qtyInput) {
+                qtyInput.value = modalState.solidPortionQty;
+            }
+
+            // Unit Pills
+            document.getElementById('solid-portion-units').innerHTML = OPTIONS.solidUnits.map(opt => {
+                const isSel = !modalState.solidPortionPreset && modalState.solidPortionUnit === opt.zh;
+                return `<button type="button" onclick="selectSolidUnit('${opt.zh}')" class="px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+            }).join('');
+
+            // Intake / Reaction Chips
             document.getElementById('solid-intake-chips').innerHTML = OPTIONS.solidIntakes.map(opt => {
                 const isSel = modalState.solidIntake === opt.zh;
                 return `<button type="button" onclick="setSingleField('solidIntake', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
             }).join('');
 
+            // Post-Meal Water Toggle Button
             const waterBtn = document.getElementById('btn-post-meal-water');
             const waterCheck = document.getElementById('post-meal-water-check');
             if (modalState.postMealWater) {
@@ -1107,17 +1218,48 @@
             }
         }
 
-        window.toggleArrayItem = function(field, val) {
-            const arr = modalState[field];
-            const idx = arr.indexOf(val);
-            if (idx > -1) arr.splice(idx, 1);
-            else arr.push(val);
-            renderActiveModalOptions();
+        window.applySolidPortionPreset = function(preset, qty, unit) {
+            modalState.solidPortionPreset = preset;
+            modalState.solidPortionQty = qty;
+            modalState.solidPortionUnit = unit;
+            const qtyInput = document.getElementById('solid-portion-qty');
+            if (qtyInput) qtyInput.value = qty;
+            renderSolidChips();
         };
 
-        window.setSingleField = function(field, val) {
-            modalState[field] = val;
-            renderActiveModalOptions();
+        window.stepSolidQty = function(delta) {
+            let current = parseFloat(modalState.solidPortionQty);
+            if (isNaN(current)) current = 1;
+            let next = Math.round((current + delta) * 10) / 10;
+            if (next < 0.5) next = 0.5;
+            modalState.solidPortionPreset = null;
+            modalState.solidPortionQty = next;
+            const qtyInput = document.getElementById('solid-portion-qty');
+            if (qtyInput) qtyInput.value = next;
+            renderSolidChips();
+        };
+
+        window.onSolidQtyInput = function() {
+            const qtyInput = document.getElementById('solid-portion-qty');
+            if (!qtyInput) return;
+            const val = parseFloat(qtyInput.value);
+            if (!isNaN(val) && val > 0) {
+                modalState.solidPortionPreset = null;
+                modalState.solidPortionQty = val;
+                document.getElementById('solid-portion-presets').innerHTML = OPTIONS.solidPortionPresets.map(opt => {
+                    return `<button type="button" onclick="applySolidPortionPreset('${opt.preset}', ${opt.qty}, '${opt.unit}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+                }).join('');
+                document.getElementById('solid-portion-units').innerHTML = OPTIONS.solidUnits.map(opt => {
+                    const isSel = modalState.solidPortionUnit === opt.zh;
+                    return `<button type="button" onclick="selectSolidUnit('${opt.zh}')" class="px-3 py-1.5 rounded-xl font-bold text-sm sm:text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
+                }).join('');
+            }
+        };
+
+        window.selectSolidUnit = function(unit) {
+            modalState.solidPortionPreset = null;
+            modalState.solidPortionUnit = unit;
+            renderSolidChips();
         };
 
         window.togglePostMealWater = function() {
@@ -1143,7 +1285,7 @@
                 localStorage.setItem('babyTrackerCustomFoodsLocal', JSON.stringify(customFoods));
                 if (!useLocalStorage) {
                     try {
-                        await setDoc(doc(db, 'baby_settings', 'custom_foods'), { items: customFoods }, { merge: true });
+                        await setDoc(doc(db, 'baby_custom_foods', 'shared_list'), { items: customFoods }, { merge: true });
                     } catch (e) {
                         console.warn("Could not sync custom food to cloud:", e);
                     }
@@ -1207,10 +1349,20 @@
                     logData.waterAmount = modalState.waterAmount;
                 }
             } else if (pendingAction.type === 'solid_food') {
+                const rawQty = parseFloat(document.getElementById('solid-portion-qty')?.value);
+                const finalQty = (!isNaN(rawQty) && rawQty > 0) ? rawQty : (modalState.solidPortionQty || 1);
+                const finalUnit = modalState.solidPortionUnit || '粒冰磚';
+                const finalPortion = modalState.solidPortionPreset
+                    ? modalState.solidPortionPreset
+                    : formatPortionString(finalQty, finalUnit);
+
                 logData.type = 'solid_food';
                 logData.bases = [...modalState.solidBases];
                 logData.foods = [...modalState.solidFoods];
-                logData.portion = modalState.solidPortion;
+                logData.portionPreset = modalState.solidPortionPreset || null;
+                logData.portionQty = finalQty;
+                logData.portionUnit = finalUnit;
+                logData.portion = finalPortion;
                 logData.intake = modalState.solidIntake;
                 logData.postMealWater = modalState.postMealWater;
             } else if (pendingAction.type === 'playtime') {
