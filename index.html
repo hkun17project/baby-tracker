@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>👶 Baby Tracker v2.0</title>
+    <title>👶 Baby Tracker v2.1</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -86,8 +86,8 @@
             box-shadow: 0 2px 4px rgba(14, 165, 233, 0.15);
         }
 
-        .filter-chip { background-color: #ffffff; color: #9ca3af; border: 2px solid #e5e7eb; }
-        .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary); border-color: var(--pastel-primary-light); }
+        .filter-chip { background-color: #ffffff; color: #6b7280; border: 2px solid #e5e7eb; }
+        .filter-chip.active { background-color: var(--pastel-bg); color: var(--pastel-primary-dark); border-color: var(--pastel-primary); }
         .history-item { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
         .active-tab { color: var(--pastel-primary); background-color: var(--pastel-bg); border-top: 6px solid var(--pastel-primary-light); }
         .inactive-tab { color: #9ca3af; border-top: 6px solid transparent; }
@@ -172,6 +172,7 @@
         
         <!-- ================= TAB 2: HISTORY (查看紀錄) ================= -->
         <section id="tab-history" class="w-full h-full flex flex-col hidden bg-white">
+            <!-- Date Switcher -->
             <div class="flex items-center justify-between px-4 py-2.5 bg-[var(--pastel-bg)] border-b-2 border-[var(--pastel-primary-light)] flex-shrink-0">
                 <button onclick="changeDate('history', -1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-left"></i></button>
                 <div class="flex flex-col items-center">
@@ -181,19 +182,46 @@
                 <button onclick="changeDate('history', 1)" class="w-11 h-11 rounded-full bg-white text-[var(--pastel-primary)] shadow-sm flex items-center justify-center text-xl font-black active:scale-95"><i class="fas fa-chevron-right"></i></button>
             </div>
             
-            <!-- Filter Bar -->
-            <div class="px-3 py-2.5 overflow-x-auto no-scrollbar whitespace-nowrap bg-white shadow-sm flex gap-2 flex-shrink-0 border-b border-gray-100">
-                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_all">全部</button>
-                <button onclick="setFilter('milk_water')" id="filter-milk_water" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_milk_water">飲奶/水</button>
-                <button onclick="setFilter('solid_food')" id="filter-solid_food" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_solid">加固</button>
-                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_pee">小便</button>
-                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_poo">大便</button>
-                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_sleep">睡眠</button>
-                <button onclick="setFilter('activity')" id="filter-activity" class="filter-chip px-4 py-1.5 rounded-full font-bold text-base transition-colors" data-i18n="filter_activity">活動</button>
+            <!-- Expanded Horizontal Scrollable Filter Bar with Icons -->
+            <div class="px-3 py-2.5 overflow-x-auto no-scrollbar whitespace-nowrap bg-[var(--pastel-bg)]/60 shadow-sm flex items-center gap-2 flex-shrink-0 border-b-2 border-[var(--pastel-primary-light)]">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-chip active px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fas fa-layer-group text-sm"></i><span data-i18n="filter_all">全部</span>
+                </button>
+                <button onclick="setFilter('milk')" id="filter-milk" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-bottle-water text-sm text-pink-500"></i><span data-i18n="filter_milk">飲奶</span>
+                </button>
+                <button onclick="setFilter('water')" id="filter-water" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-glass-water text-sm text-sky-500"></i><span data-i18n="filter_water">飲水</span>
+                </button>
+                <button onclick="setFilter('solid_food')" id="filter-solid_food" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-bowl-food text-sm text-amber-600"></i><span data-i18n="filter_solid">加固食物</span>
+                </button>
+                <button onclick="setFilter('playtime')" id="filter-playtime" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-shapes text-sm text-emerald-600"></i><span data-i18n="filter_playtime">Playtime</span>
+                </button>
+                <button onclick="setFilter('walk')" id="filter-walk" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-tree text-sm text-teal-600"></i><span data-i18n="filter_walk">散步</span>
+                </button>
+                <button onclick="setFilter('pee')" id="filter-pee" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fas fa-droplet text-sm text-yellow-500"></i><span data-i18n="filter_pee">小便</span>
+                </button>
+                <button onclick="setFilter('poo')" id="filter-poo" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fas fa-poop text-sm text-orange-600"></i><span data-i18n="filter_poo">大便</span>
+                </button>
+                <button onclick="setFilter('sleep')" id="filter-sleep" class="filter-chip px-4 py-2 rounded-full font-black text-base shadow-sm transition-all active:scale-95 inline-flex items-center gap-1.5">
+                    <i class="fas fa-moon text-sm text-purple-600"></i><span data-i18n="filter_sleep">睡眠</span>
+                </button>
             </div>
             
+            <!-- Swipeable History List Container -->
             <div id="history-swipe-area" class="flex-1 overflow-y-auto no-scrollbar p-3 relative bg-gray-50">
-                <div class="text-sm text-gray-400 mb-2.5 px-2 text-center" data-i18n="history_hint">💡 長按記錄可修改或刪除</div>
+                <!-- Sub-header: Long press hint + Sort Direction Toggle Button -->
+                <div class="flex items-center justify-between mb-2.5 px-1 gap-2">
+                    <span class="text-xs sm:text-sm text-gray-500 font-bold" data-i18n="history_hint">💡 長按可修改/刪除</span>
+                    <button type="button" onclick="toggleHistorySort()" id="btn-history-sort" class="bg-white text-[var(--pastel-primary-dark)] border-2 border-[var(--pastel-primary-light)] px-3.5 py-1.5 rounded-full text-sm font-black shadow-sm flex items-center gap-1.5 active:scale-95 flex-shrink-0">
+                        <span id="history-sort-text">順序 ⬇</span>
+                    </button>
+                </div>
                 <div id="history-list" class="space-y-2.5 pb-6"></div>
             </div>
         </section>
@@ -569,6 +597,7 @@
         let selectedLogId = null; 
         let currentLang = 'zh';
         let currentFilter = 'all'; 
+        let historySortAsc = true; // Default: chronological top-to-bottom (早→晚 / 順序 ⬇)
         let useLocalStorage = false;
         let lastCloudError = '';
         
@@ -623,7 +652,7 @@
             ],
             solidIntakes: [
                 { zh: '試味 (幾啖)', en: 'Tasted (Sips)' },
-                { zh: '食少少 (1/3)', en: 'Ate Little (1/3)' },
+                { zh: '食少少 (約1/3)', en: 'Ate Little (1/3)' },
                 { zh: '食大半', en: 'Ate Most' },
                 { zh: '食晒 🎉', en: 'Finished All 🎉' },
                 { zh: '抗拒/吐出', en: 'Refused/Spat' }
@@ -653,13 +682,13 @@
                 { mins: 90, zh: '1.5小時', en: '1.5 hrs' }
             ],
             walkPlaces: [
-                { zh: '公園散步', en: 'Park Walk' },
+                { zh: '樓下公園', en: 'Park Walk' },
+                { zh: '海濱長廊', en: 'Promenade' },
                 { zh: '商場逛街', en: 'Mall Stroll' },
                 { zh: '曬太陽', en: 'Sunbath' }
             ]
         };
 
-        // Helper to translate stored Chinese canonical strings into current UI language
         function trOpt(zhVal) {
             if (currentLang === 'zh') return zhVal;
             const allGroups = [
@@ -671,7 +700,7 @@
                 const found = grp.find(item => item.zh === zhVal);
                 if (found) return found.en;
             }
-            return zhVal; // custom user-entered foods stay as typed
+            return zhVal;
         }
 
         function trDuration(mins) {
@@ -692,7 +721,7 @@
                 sleep_start: "開始睡", sleep_end: "睡醒了", milk: "飲奶", water: "飲清水",
                 milk_water_btn: "飲奶 / 飲水", solid_food: "加固食品", playtime: "Playtime", walk: "散步外出",
                 tab_log: "記錄活動", tab_history: "查看紀錄", tab_summary: "總結",
-                history_hint: "💡 長按記錄可修改或刪除", time_label: "選擇時間", amount_label: "奶量 (ml)",
+                history_hint: "💡 長按可修改/刪除", time_label: "選擇時間", amount_label: "奶量 (ml)",
                 water_amount_label: "飲水量", solid_base_label: "1. 調配基底 (可複選)",
                 solid_food_label: "2. 食材種類 (可複選)", solid_portion_label: "3. 準備份量",
                 solid_intake_label: "4. 實際表現", post_meal_water: "餐後飲水 (幾啖)",
@@ -701,7 +730,9 @@
                 cancel: "取消", confirm: "確認", action_title: "選擇操作", edit: "修改記錄", delete: "刪除記錄", 
                 delete_confirm_title: "確定刪除？", delete_confirm_msg: "刪除後將無法恢復。", delete_btn: "確定刪除",
                 no_record: "暫無紀錄", toast_save: "儲存成功！", toast_del: "已刪除", confirm_title_add: "新增記錄", confirm_title_edit: "修改記錄",
-                filter_all: "全部", filter_milk_water: "飲奶/水", filter_solid: "加固", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠", filter_activity: "活動",
+                filter_all: "全部", filter_milk: "飲奶", filter_water: "飲水", filter_solid: "加固食物",
+                filter_playtime: "Playtime", filter_walk: "散步", filter_pee: "小便", filter_poo: "大便", filter_sleep: "睡眠",
+                sort_asc: "順序 ⬇", sort_desc: "倒序 ⬆",
                 total_milk: "總奶量", total_solid: "加固", total_pee: "小便", total_poo: "大便", total_activity: "活動", total_sleep: "睡眠",
                 swipe_hint: "左右滑動切換日期", today: "今天", gap_prefix: "與上次相距 ", gap_duration: "長度: ", gap_hr: "小時", gap_min: "分",
                 hr_unit: "小時", ongoing: "進行中", to: "至", reset: "清零",
@@ -721,7 +752,9 @@
                 cancel: "Cancel", confirm: "Confirm", action_title: "Select Action", edit: "Edit", delete: "Delete", 
                 delete_confirm_title: "Delete?", delete_confirm_msg: "Cannot be undone.", delete_btn: "Delete",
                 no_record: "No records", toast_save: "Saved!", toast_del: "Deleted", confirm_title_add: "New Record", confirm_title_edit: "Edit Record",
-                filter_all: "All", filter_milk_water: "Milk/Water", filter_solid: "Solids", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep", filter_activity: "Activity",
+                filter_all: "All", filter_milk: "Milk", filter_water: "Water", filter_solid: "Solids",
+                filter_playtime: "Playtime", filter_walk: "Walk", filter_pee: "Wet", filter_poo: "Dirty", filter_sleep: "Sleep",
+                sort_asc: "Oldest ⬇", sort_desc: "Newest ⬆",
                 total_milk: "Total Milk", total_solid: "Solids", total_pee: "Wet", total_poo: "Dirty", total_activity: "Activity", total_sleep: "Sleep",
                 swipe_hint: "Swipe to change date", today: "Today", gap_prefix: "Since last: ", gap_duration: "Duration: ", gap_hr: "h ", gap_min: "m",
                 hr_unit: "hrs", ongoing: "Ongoing", to: "to", reset: "Reset",
@@ -782,7 +815,6 @@
 
         async function initAuth() {
             updateStatusUI('connecting');
-            // Load local custom foods immediately so UI is responsive
             try {
                 const localFoods = localStorage.getItem('babyTrackerCustomFoodsLocal');
                 if (localFoods) customFoods = JSON.parse(localFoods);
@@ -819,7 +851,6 @@
         function subscribeToData() {
             if (useLocalStorage) return;
             try {
-                // 1. Subscribe to logs
                 const logsRef = collection(db, COLLECTION_NAME);
                 onSnapshot(logsRef, (snapshot) => {
                     useLocalStorage = false;
@@ -833,7 +864,6 @@
                     enableLocalMode(error.code || error.message);
                 });
 
-                // 2. Subscribe to custom foods settings
                 const customFoodsDoc = doc(db, 'baby_settings', 'custom_foods');
                 onSnapshot(customFoodsDoc, (docSnap) => {
                     if (docSnap.exists() && Array.isArray(docSnap.data().items)) {
@@ -861,6 +891,7 @@
             document.getElementById('new-food-input').placeholder = currentLang === 'zh' ? '輸入新食材 (如: 三文魚)' : 'Enter new food (e.g. Salmon)';
             updateTexts();
             updateStatusUI(useLocalStorage ? 'local' : 'cloud');
+            updateSortButtonUI();
             
             if (!document.getElementById('tab-history').classList.contains('hidden')) renderHistory();
             if (!document.getElementById('tab-summary').classList.contains('hidden')) updateSummaryUI();
@@ -877,6 +908,7 @@
             });
             updateDateDisplay('history');
             updateDateDisplay('summary');
+            updateSortButtonUI();
         }
         
         window.switchTab = function(tabName) {
@@ -915,19 +947,16 @@
             const normalizedType = (type === 'water') ? 'milk' : type;
             pendingAction = { type: normalizedType, mode, id: existingLog?.id };
             
-            // Hide all sub-containers first
             ['modal-milk-water-container', 'modal-solid-container', 'modal-playtime-container', 'modal-walk-container'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
             });
             document.getElementById('add-food-box').classList.add('hidden');
 
-            // Set time
             const baseTime = existingLog ? new Date(existingLog.timestamp) : new Date();
             const hrsStr = baseTime.getHours().toString().padStart(2, '0');
             const minsStr = baseTime.getMinutes().toString().padStart(2, '0');
             document.getElementById('modal-time').value = `${hrsStr}:${minsStr}`;
 
-            // Initialize state based on type & existingLog
             if (normalizedType === 'milk') {
                 document.getElementById('modal-milk-water-container').classList.remove('hidden');
                 if (existingLog && existingLog.type === 'water') {
@@ -1038,13 +1067,11 @@
 
         // --- Solid Food Chips & Custom Food Sync ---
         function renderSolidChips() {
-            // 1. Bases (multi-select)
             document.getElementById('solid-base-chips').innerHTML = OPTIONS.solidBases.map(opt => {
                 const isSel = modalState.solidBases.includes(opt.zh);
                 return `<button type="button" onclick="toggleArrayItem('solidBases', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
             }).join('');
 
-            // 2. Foods (Presets + Custom Foods + Add Button)
             const allFoodItems = [
                 ...OPTIONS.presetFoods.map(f => ({ zh: f.zh, label: currentLang === 'zh' ? f.zh : f.en })),
                 ...customFoods.filter(cf => !OPTIONS.presetFoods.some(pf => pf.zh === cf)).map(cf => ({ zh: cf, label: cf }))
@@ -1059,19 +1086,16 @@
             foodsHtml += `<button type="button" onclick="toggleAddFoodBox()" class="px-3.5 py-2 rounded-xl font-black text-base bg-amber-100 text-amber-800 border-2 border-dashed border-amber-400 active:scale-95">${i18n[currentLang].add_food_btn}</button>`;
             document.getElementById('solid-food-chips').innerHTML = foodsHtml;
 
-            // 3. Portion (single-select)
             document.getElementById('solid-portion-chips').innerHTML = OPTIONS.solidPortions.map(opt => {
                 const isSel = modalState.solidPortion === opt.zh;
                 return `<button type="button" onclick="setSingleField('solidPortion', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
             }).join('');
 
-            // 4. Intake (single-select)
             document.getElementById('solid-intake-chips').innerHTML = OPTIONS.solidIntakes.map(opt => {
                 const isSel = modalState.solidIntake === opt.zh;
                 return `<button type="button" onclick="setSingleField('solidIntake', '${opt.zh}')" class="px-3.5 py-2 rounded-xl font-bold text-base opt-chip ${isSel ? 'selected-amber' : ''}">${currentLang === 'zh' ? opt.zh : opt.en}</button>`;
             }).join('');
 
-            // 5. Post-Meal Water Toggle
             const waterBtn = document.getElementById('btn-post-meal-water');
             const waterCheck = document.getElementById('post-meal-water-check');
             if (modalState.postMealWater) {
@@ -1218,7 +1242,6 @@
             }
             
             try {
-                // Overwrite completely (no merge) so switching between milk & water cleans old fields cleanly
                 const docRef = doc(db, COLLECTION_NAME, docId);
                 await setDoc(docRef, logData);
             } catch (error) { 
@@ -1280,9 +1303,10 @@
         }
         
         // =========================================================================
-        // TAB 2: HISTORY LIST & TIME GAP (1 decimal place for sleep duration)
+        // TAB 2: HISTORY LIST, CHRONOLOGICAL SORT & EXPANDED FILTERS
         // =========================================================================
         function getGapText(log) {
+            // Always sort descending chronologically to find the immediately preceding earlier record
             const sorted = [...logsData].sort((a, b) => b.timestamp - a.timestamp);
             const idx = sorted.findIndex(l => l.id === log.id);
             if (idx === -1) return '';
@@ -1315,48 +1339,58 @@
                 const parts = [];
                 if (log.bases && log.bases.length) parts.push(log.bases.map(trOpt).join('+'));
                 if (log.foods && log.foods.length) parts.push(log.foods.map(trOpt).join('、'));
-                const sub = [];
-                if (log.portion) sub.push(trOpt(log.portion));
-                if (log.intake) sub.push(trOpt(log.intake));
-                if (log.postMealWater) sub.push(currentLang === 'zh' ? '💧餐後飲水' : '💧Post-water');
-                let res = parts.join(' · ');
-                if (sub.length) res += (res ? ` (${sub.join(' · ')})` : sub.join(' · '));
-                return res;
+                const meta = [];
+                if (log.portion) meta.push(trOpt(log.portion));
+                if (log.intake) meta.push(trOpt(log.intake));
+                if (log.postMealWater) meta.push(currentLang === 'zh' ? '💧餐後飲水' : '💧Post-meal water');
+                const mainStr = parts.join(' · ');
+                const metaStr = meta.length ? `(${meta.join(' · ')})` : '';
+                return [mainStr, metaStr].filter(Boolean).join(' ');
             } else if (log.type === 'playtime') {
-                const acts = (log.activities || []).map(trOpt).join('、');
-                const dur = trDuration(log.durationMinutes || 15);
-                return acts ? `${acts} (${dur})` : dur;
+                const acts = (log.activities && log.activities.length) ? log.activities.map(trOpt).join('、') : '';
+                return acts;
             } else if (log.type === 'walk') {
-                const dur = trDuration(log.durationMinutes || 30);
-                const pls = (log.places || []).map(trOpt).join('、');
-                return pls ? `${pls} (${dur})` : dur;
+                const places = (log.places && log.places.length) ? log.places.map(trOpt).join('、') : '';
+                return places;
             }
             return '';
         }
-        
+
+        window.toggleHistorySort = function() {
+            historySortAsc = !historySortAsc;
+            updateSortButtonUI();
+            renderHistory();
+        };
+
+        function updateSortButtonUI() {
+            const textEl = document.getElementById('history-sort-text');
+            if (!textEl) return;
+            textEl.innerText = historySortAsc ? i18n[currentLang].sort_asc : i18n[currentLang].sort_desc;
+        }
+
         window.setFilter = function(f) {
             currentFilter = f;
             document.querySelectorAll('.filter-chip').forEach(el => {
-                el.classList.remove('active', 'text-[var(--pastel-primary)]', 'bg-[var(--pastel-bg)]', 'border-[var(--pastel-primary-light)]');
-                el.classList.add('text-[#9ca3af]', 'bg-white', 'border-[#e5e7eb]');
+                el.classList.remove('active');
             });
             const activeBtn = document.getElementById(`filter-${f}`);
-            activeBtn.classList.remove('text-[#9ca3af]', 'bg-white', 'border-[#e5e7eb]');
-            activeBtn.classList.add('active', 'text-[var(--pastel-primary)]', 'bg-[var(--pastel-bg)]', 'border-[var(--pastel-primary-light)]');
+            if (activeBtn) activeBtn.classList.add('active');
             renderHistory();
         };
         
         function renderHistory() {
             updateDateDisplay('history');
+            updateSortButtonUI();
             const container = document.getElementById('history-list');
             
             let dayLogs = getLogsForDay(historyDate);
-            dayLogs.sort((a, b) => b.timestamp - a.timestamp);
+            // Chronological top-to-bottom by default (historySortAsc = true), or reverse when toggled
+            dayLogs.sort((a, b) => historySortAsc ? (a.timestamp - b.timestamp) : (b.timestamp - a.timestamp));
+
             if (currentFilter !== 'all') {
                 dayLogs = dayLogs.filter(log => {
-                    if (currentFilter === 'milk_water') return log.type === 'milk' || log.type === 'water';
                     if (currentFilter === 'sleep') return log.type === 'sleep_start' || log.type === 'sleep_end';
-                    if (currentFilter === 'activity') return log.type === 'playtime' || log.type === 'walk';
+                    if (currentFilter === 'water') return log.type === 'water' || (log.type === 'solid_food' && log.postMealWater);
                     return log.type === currentFilter;
                 });
             }
@@ -1600,8 +1634,12 @@
                 extraStr = `${log.amount} ml`;
             } else if (log.type === 'water') {
                 extraStr = trOpt(log.waterAmount || '幾啖');
-            } else if (log.type === 'solid_food' || log.type === 'playtime' || log.type === 'walk') {
+            } else if (log.type === 'solid_food') {
                 extraStr = formatLogSummaryText(log);
+            } else if (log.type === 'playtime' || log.type === 'walk') {
+                const dur = trDuration(log.durationMinutes || 15);
+                const desc = formatLogSummaryText(log);
+                extraStr = desc ? `${desc} (${dur})` : dur;
             } else if (log.type === 'sleep_start') {
                 if (logEnd) {
                     const dEnd = new Date(logEnd.timestamp);
